@@ -20,13 +20,26 @@ def main():
         return 1
 
     if args.build_index:
-        with roms.ROMSIndexFile(args.index_file) as index_file:
-            with roms.ROMSOutputFile(args.model_output_file) as model_output_file:
-                index_file.init_nc(model_output_file, 445, 761)
-                index_file.compute_indexes_coefficients(model_output_file)
+         # with roms.RegularGrid(args.model_output_file) as regular_grid:
+            #comment - argument for inputing resolution for RegularGrid Class
+            #regular_grid.init_nc(model_output_file, 500 )
+            #comment - agument to choose method
+            #regular_grid.shpExtent(num_cells_y, num_cells_x)
+            #regular_grid.ofsExtent(num_cells_y, num_cells_x)
+            with roms.ROMSIndexFile(args.index_file) as index_file:
+                with roms.ROMSOutputFile(args.model_output_file) as model_output_file:
+                    #comment - get num cells xy from Regular Grid Class
+                    #index_file.init_nc(model_output_file, regular_grid.num_cells_y, regular_grid.num_cells_y )
+                    index_file.init_nc(model_output_file, 761, 445)
+                    index_file.compute_indexes_coefficients(model_output_file)
     elif args.s111_file:
         with S111File(args.s111_file) as s111_file:
             s111_file.add_output(args.model_output_file, args.index_file)
+
+    #comment -argument to run through each subset, create an hdf5 file for each subset 
+    #comment -Run target functions for each of 48 forecasts
+    #for id in index:
+        #subset = ma.masked_not_equal(subset_mask, index[id])
 
     return 0
 

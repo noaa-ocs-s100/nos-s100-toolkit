@@ -29,21 +29,10 @@ def main():
     if args.build_index:
         with roms.ROMSIndexFile(args.index_file) as index_file, \
              roms.ROMSOutputFile(args.model_output_file) as model_output_file:
-            index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS)
+             index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, shoreline_shp = 'nos80k.shp', subset_grid_shp = 'grids_160k.shp')
     elif args.s111_file:
         with S111File(args.s111_file) as s111_file:
             s111_file.add_output(args.model_output_file, args.index_file)
-
-    #comment -argument to run through each subset, create an hdf5 file for each subset 
-    #comment -Run target functions for each of 48 forecasts
-    #for id in index:
-        #subset = ma.masked_not_equal(subset_mask, index[id])
-
-        #comment - argument for inputing resolution for RegularGrid Class
-         # with roms.RegularGrid(args.model_output_file) as regular_grid:
-            #comment - agument to choose method
-            #regular_grid.shpExtent(num_cells_y, num_cells_x)
-            #regular_grid.ofsExtent(num_cells_y, num_cells_x)
 
     return 0
 

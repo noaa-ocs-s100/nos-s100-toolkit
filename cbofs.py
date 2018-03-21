@@ -29,7 +29,7 @@ def main():
     if args.build_index:
         with roms.ROMSIndexFile(args.index_file) as index_file, \
              roms.ROMSOutputFile(args.model_output_file) as model_output_file:
-             index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, shoreline_shp = 'nos80k.shp', subset_grid_shp = 'grids_160k.shp')
+            index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, shoreline_shp = 'nos80k.shp', subset_grid_shp = 'grids_160k.shp')
     elif args.s111_file:
         with S111File(args.s111_file) as s111_file:
             s111_file.add_output(args.model_output_file, args.index_file)

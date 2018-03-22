@@ -3,7 +3,7 @@
 import argparse
 
 from s100ofs.model import roms
-from s100ofs.s111 import S111File
+from s100ofs import s111
 
 # Target resolution of regular grid cells, in meters. Actual x/y resolution of
 # grid cells will vary slightly, since the regular grid uses lat/lon
@@ -15,24 +15,23 @@ TARGET_GRID_RESOLUTION_METERS = 500
 def main():
     """Parse command line arguments and execute target functions."""
     parser = argparse.ArgumentParser(description='Create or modify S-111 File')
-    parser.add_argument("model_output_file", help="Path to a NetCDF file containing raw model output to be converted to S111 format or used to build an index file.")
-    parser.add_argument('index_file', help='Path to regular grid index netcdf file used to add model output to the S111 HDF5 file, or to be created when --build_index is specified.')
-    parser.add_argument('-s', '--s111_file', help='Name of target S111 HDF5 file (should end in .h5). If the file does not already exist, it will be created. Ignored if -b is specified.')
+    parser.add_argument('index_file_path', help='Path to regular grid index netcdf file used to add model output to the S111 HDF5 file, or to be created when --build_index is specified.')
+    parser.add_argument('-s', '--s111_path', help='Path prefix of output S111 HDF5 file(s) (without file extension). Any required identifying information (e.g. subgrid id) as well as the .h5 extension will be appended to create the final output path(s). Ignored if -b is specified.')
     parser.add_argument('-b', '--build_index', action='store_true', help='Build the regular grid index NetCDF file (WARNING: Takes up to ~12 hours). This file must be generated before processing any model output. Once created, it can be used indefinitely unless changes to the regular grid extent/resolution are required.')
+    parser.add_argument("model_output_files", metavar="roms_file_path", nargs="+", help="Path to one or more NetCDF files containing raw model output to be converted to S111 format or used to build an index file.")
     args = parser.parse_args()
 
-    if not args.s111_file and not args.build_index:
-        parser.error("Either --s111_file or --build_index must be specified.")
+    if not args.s111_path and not args.build_index:
+        parser.error("Either --s111_path or --build_index must be specified.")
         print(args)
         return 1
 
     if args.build_index:
         with roms.ROMSIndexFile(args.index_file) as index_file, \
-             roms.ROMSOutputFile(args.model_output_file) as model_output_file:
+             roms.ROMSOutputFile(args.model_output_files[0]) as model_output_file:
             index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, shoreline_shp = 'nos80k.shp', subset_grid_shp = 'grids_160k.shp')
-    elif args.s111_file:
-        with S111File(args.s111_file) as s111_file:
-            s111_file.add_output(args.model_output_file, args.index_file)
+    elif args.s111_path:
+        s111.romsToS111(args.index_file_path, args.model_output_files, args.s111_path)
 
     return 0
 

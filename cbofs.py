@@ -25,7 +25,7 @@ GRID_SUBSET_SHP_PATH = "shp/grids_160k.shp"
 
 # Path format/prefix for output S111 files. Forecast initialization (reference)
 # time will be injected using datetime.strftime()
-S111_PATH_FORMAT = "/media/sf_NWSD2OTraining/s100/git/h5/cbofs_s111_%Y%m%d_%H"
+S111_PATH_FORMAT = "h5/cbofs_s111_%Y%m%d_%H"
 
 # Base URL of CO-OPS HTTP server for NetCDF files
 HTTP_SERVER_COOPS = "https://opendap.co-ops.nos.noaa.gov"
@@ -38,7 +38,7 @@ HTTP_SERVER_COOPS = "https://opendap.co-ops.nos.noaa.gov"
 HTTP_NETCDF_PATH_FORMAT = "/thredds/fileServer/NOAA/CBOFS/MODELS/%Y%m/nos.cbofs.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
 
 # Folder path of downloaded NetCDF files.
-LOCAL_NETCDF_PATH_FORMAT = "/media/sf_NWSD2OTraining/s100/git/netcdf/nos.cbofs.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
+LOCAL_NETCDF_PATH_FORMAT = "netcdf/nos.cbofs.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
 
 # List of forecast projection hours to be processed
 FORECAST_HOURS = list(range(1,6))#49))

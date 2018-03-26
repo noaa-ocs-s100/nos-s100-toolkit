@@ -86,7 +86,7 @@ def download_and_process(index_file_path, s111_path):
     elif now.hour < 13 or (now.hour == 13 and now.minute < 50):
         cycletime = datetime.datetime(now.year, now.month, now.day, 6, 0)
         print(cycletime)
-    elif now.hour < 19 or (now.hour == 7 and now.minute < 50):
+    elif now.hour < 19 or (now.hour == 19 and now.minute < 50):
         cycletime = datetime.datetime(now.year, now.month, now.day, 12, 0)
         print(cycletime)
     else:
@@ -123,7 +123,7 @@ def main():
             grid_subset = GRID_SUBSET_SHP_PATH
         with roms.ROMSIndexFile(args.index_file_path) as index_file, \
              roms.ROMSOutputFile(args.model_output_files[0]) as model_output_file:
-            index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, shoreline_shp=SHORELINE_SHP_PATH, subset_grid_shp=grid_subset)
+            index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, shoreline_shp=SHORELINE_SHP_PATH, subset_grid_shp=GRID_SUBSET_SHP_PATH)
     elif args.s111_path:
         if args.model_output_files is not None:
             s111.romsToS111(args.index_file_path, args.model_output_files, args.s111_path)

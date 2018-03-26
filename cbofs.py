@@ -41,7 +41,7 @@ HTTP_NETCDF_PATH_FORMAT = "/thredds/fileServer/NOAA/CBOFS/MODELS/%Y%m/nos.cbofs.
 LOCAL_NETCDF_PATH_FORMAT = "netcdf/nos.cbofs.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
 
 # List of forecast projection hours to be processed
-FORECAST_HOURS = list(range(1,6))#49))
+FORECAST_HOURS = list(range(1,49))
 
 def download(cycletime, forecasts):
     """Download specified forecasts for specified model cycle time.
@@ -75,24 +75,21 @@ def download_and_process(index_file_path, s111_path):
         s111_path: Path prefix of output S111 HDF5 file(s).
     """
     now = datetime.datetime.utcnow()
-    print(now)
-    if now.hour < 1 and now.minute < 50:
+    if now.hour < 2 and now.minute < 50:
         yesterday = now - datetime.timedelta(days=1)
         cycletime = datetime.datetime(yesterday.year, yesterday.month, yesterday.day, 18, 0)
-        print(cycletime)
-    elif now.hour < 7 or (now.hour == 7 and now.minute < 50):
+    elif now.hour < 8 or (now.hour == 8 and now.minute < 50):
         cycletime = datetime.datetime(now.year, now.month, now.day, 0, 0)
-        print(cycletime)
-    elif now.hour < 13 or (now.hour == 13 and now.minute < 50):
+    elif now.hour < 14 or (now.hour == 14 and now.minute < 50):
         cycletime = datetime.datetime(now.year, now.month, now.day, 6, 0)
-        print(cycletime)
-    elif now.hour < 19 or (now.hour == 19 and now.minute < 50):
+    elif now.hour < 20 or (now.hour == 20 and now.minute < 50):
         cycletime = datetime.datetime(now.year, now.month, now.day, 12, 0)
-        print(cycletime)
     else:
         cycletime = datetime.datetime(now.year, now.month, now.day, 18, 0)
-        print(cycletime)
     
+    print("Current time (UTC): {}".format(now))
+    print("Processing forecast cycle with reference time (UTC): {}".format(cycletime))
+
     model_output_files = download(cycletime, FORECAST_HOURS)
     print("Converting files to S111 format...")
     s111.romsToS111(index_file_path, model_output_files, s111_path)

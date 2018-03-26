@@ -13,7 +13,7 @@ from s100ofs import s111
 # coordinates (thus a cell's width/height in meters will vary by latitude), and
 # since it will be adjusted in order to fit a whole number of grid cells in the
 # x and y directions within the calculated grid extent.
-TARGET_GRID_RESOLUTION_METERS = 500
+TARGET_GRID_RESOLUTION_METERS = 5000
 
 # Path to shoreline shapefile used to mask out land areas during index file
 # creation.
@@ -120,10 +120,15 @@ def main():
             return 1
         grid_subset = None
         if args.grid_subset:
-            grid_subset = GRID_SUBSET_SHP_PATH
-        with roms.ROMSIndexFile(args.index_file_path) as index_file, \
-             roms.ROMSOutputFile(args.model_output_files[0]) as model_output_file:
-            index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, shoreline_shp=SHORELINE_SHP_PATH, subset_grid_shp=GRID_SUBSET_SHP_PATH)
+            #grid_subset = GRID_SUBSET_SHP_PATH
+            with roms.ROMSIndexFile(args.index_file_path) as index_file, \
+                 roms.ROMSOutputFile(args.model_output_files[0]) as model_output_file:
+                index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, shoreline_shp=SHORELINE_SHP_PATH, subset_grid_shp=GRID_SUBSET_SHP_PATH)
+        else:
+            with roms.ROMSIndexFile(args.index_file_path) as index_file, \
+                 roms.ROMSOutputFile(args.model_output_files[0]) as model_output_file:
+                index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, shoreline_shp=SHORELINE_SHP_PATH)    
+
     elif args.s111_path:
         if args.model_output_files is not None:
             s111.romsToS111(args.index_file_path, args.model_output_files, args.s111_path)

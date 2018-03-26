@@ -75,17 +75,23 @@ def download_and_process(index_file_path, s111_path):
         s111_path: Path prefix of output S111 HDF5 file(s).
     """
     now = datetime.datetime.utcnow()
-    if now.hour < 1 and now.minute < 25:
+    print(now)
+    if now.hour < 1 and now.minute < 50:
         yesterday = now - datetime.timedelta(days=1)
-        cycletime = datetime.datetime(yesterday.year, yesterday.month, yesterday,day, 18, 0)
-    elif now.hour < 7 and now.minute < 25:
+        cycletime = datetime.datetime(yesterday.year, yesterday.month, yesterday.day, 18, 0)
+        print(cycletime)
+    elif now.hour < 7 or (now.hour == 7 and now.minute < 50):
         cycletime = datetime.datetime(now.year, now.month, now.day, 0, 0)
-    elif now.hour < 13 and now.minute < 25:
+        print(cycletime)
+    elif now.hour < 13 or (now.hour == 13 and now.minute < 50):
         cycletime = datetime.datetime(now.year, now.month, now.day, 6, 0)
-    elif now.hour < 19 and now.minute < 25:
+        print(cycletime)
+    elif now.hour < 19 or (now.hour == 7 and now.minute < 50):
         cycletime = datetime.datetime(now.year, now.month, now.day, 12, 0)
+        print(cycletime)
     else:
         cycletime = datetime.datetime(now.year, now.month, now.day, 18, 0)
+        print(cycletime)
     
     model_output_files = download(cycletime, FORECAST_HOURS)
     print("Converting files to S111 format...")
@@ -108,14 +114,14 @@ def main():
         return 1
     
     if args.build_index:
-        if args.model_output_files is not None:
+        if args.model_output_files is None:
             parser.error("At least one model output file must be specified with --model_output_files when --build_index is specified.")
             print(args)
             return 1
         grid_subset = None
         if args.grid_subset:
             grid_subset = GRID_SUBSET_SHP_PATH
-        with roms.ROMSIndexFile(args.index_file) as index_file, \
+        with roms.ROMSIndexFile(args.index_file_path) as index_file, \
              roms.ROMSOutputFile(args.model_output_files[0]) as model_output_file:
             index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, shoreline_shp=SHORELINE_SHP_PATH, subset_grid_shp=grid_subset)
     elif args.s111_path:

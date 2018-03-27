@@ -4,6 +4,9 @@ import argparse
 import datetime
 import shutil
 import urllib.request
+import os
+from glob import glob
+import sys
 
 from s100ofs.model import roms
 from s100ofs import s111
@@ -15,6 +18,9 @@ from s100ofs import s111
 # x and y directions within the calculated grid extent.
 TARGET_GRID_RESOLUTION_METERS = 500
 
+PACKAGE = "s100ofs"
+PACKAGE_PATH = os.path.dirname(os.path.realpath(PACKAGE))
+
 # Path to shoreline shapefile used to mask out land areas during index file
 # creation.
 SHORELINE_SHP_PATH = "shp/nos80k.shp"
@@ -22,10 +28,6 @@ SHORELINE_SHP_PATH = "shp/nos80k.shp"
 # Path to grid subset shapefile used to identify subgrid areas during index
 # file creation.
 GRID_SUBSET_SHP_PATH = "shp/grids_160k.shp"
-
-# Path format/prefix for output S111 files. Forecast initialization (reference)
-# time will be injected using datetime.strftime()
-S111_PATH_FORMAT = "h5/cbofs_s111_%Y%m%d_%H"
 
 # Base URL of CO-OPS HTTP server for NetCDF files
 HTTP_SERVER_COOPS = "https://opendap.co-ops.nos.noaa.gov"
@@ -38,7 +40,8 @@ HTTP_SERVER_COOPS = "https://opendap.co-ops.nos.noaa.gov"
 HTTP_NETCDF_PATH_FORMAT = "/thredds/fileServer/NOAA/CBOFS/MODELS/%Y%m/nos.cbofs.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
 
 # Folder path of downloaded NetCDF files.
-LOCAL_NETCDF_PATH_FORMAT = "netcdf/nos.cbofs.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
+LOCAL_NETCDF_PATH_FORMAT ="netcdf/nos.cbofs.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
+
 
 # List of forecast projection hours to be processed
 FORECAST_HOURS = list(range(1,49))
@@ -55,6 +58,21 @@ def download(cycletime, forecasts):
         List of paths to NetCDF files downloaded successfully, corresponding
         with the order specified in `forecasts`.
     """
+    if not os.path.exists("{}/{}".format(PACKAGE_PATH, "netcdf")):
+        os.makedirs("{}/{}".format(PACKAGE_PATH, "netcdf"))
+    else:
+    # Clean the directory of all data files before downloading and
+    # processing the new data:
+    # NetCDF files:
+        if os.path.exists("{}/{}".format(PACKAGE_PATH, "netcdf")):
+            filesToDelete = glob("{}/{}/{}".format(PACKAGE_PATH, "/netcdf", "/*.nc"))
+            for file in filesToDelete:
+                sys.stderr.write("Removing {0}\n".format(file))
+                os.remove(file)
+
+    if not os.path.exists("{}/{}".format(PACKAGE_PATH, "h5")):
+        os.makedirs("{}/{}".format(PACKAGE_PATH, "h5"))
+
     local_files = []
     for forecast in forecasts:
         forecast_str = "f{0:03d}".format(forecast)
@@ -92,7 +110,7 @@ def download_and_process(index_file_path, s111_path):
 
     model_output_files = download(cycletime, FORECAST_HOURS)
     print("Converting files to S111 format...")
-    s111.romsToS111(index_file_path, model_output_files, s111_path)
+    s111.romsToS111(index_file_path, model_output_files, s111_path, cycletime)
     print("Conversion complete.")
 
 def main():
@@ -128,10 +146,9 @@ def main():
 
     elif args.s111_path:
         if args.model_output_files is not None:
-            s111.romsToS111(args.index_file_path, args.model_output_files, args.s111_path)
+            s111.romsToS111("{}/{}".format(PACKAGE_PATH, args.index_file_path), args.model_output_files,"{}/{}".format(PACKAGE_PATH, args.s111_path))
         else:
-            download_and_process(args.index_file_path, args.s111_path)
-
+            download_and_process("{}/{}".format(PACKAGE_PATH, args.index_file_path),"{}/{}".format(PACKAGE_PATH, args.s111_path))
     return 0
 
 if __name__ == "__main__":

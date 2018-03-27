@@ -13,7 +13,7 @@ from s100ofs import s111
 # coordinates (thus a cell's width/height in meters will vary by latitude), and
 # since it will be adjusted in order to fit a whole number of grid cells in the
 # x and y directions within the calculated grid extent.
-TARGET_GRID_RESOLUTION_METERS = 5000
+TARGET_GRID_RESOLUTION_METERS = 500
 
 # Path to shoreline shapefile used to mask out land areas during index file
 # creation.

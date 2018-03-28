@@ -42,7 +42,6 @@ HTTP_NETCDF_PATH_FORMAT = "/thredds/fileServer/NOAA/CBOFS/MODELS/%Y%m/nos.cbofs.
 # Folder path of downloaded NetCDF files.
 LOCAL_NETCDF_PATH_FORMAT ="netcdf/nos.cbofs.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
 
-
 # List of forecast projection hours to be processed
 FORECAST_HOURS = list(range(1,49))
 
@@ -65,7 +64,7 @@ def download(cycletime, forecasts):
     # processing the new data:
     # NetCDF files:
         if os.path.exists("{}/{}".format(PACKAGE_PATH, "netcdf")):
-            filesToDelete = glob("{}/{}/{}".format(PACKAGE_PATH, "/netcdf", "/*.nc"))
+            filesToDelete = glob("{}/{}/{}".format(PACKAGE_PATH, "netcdf", "*.nc"))
             for file in filesToDelete:
                 sys.stderr.write("Removing {0}\n".format(file))
                 os.remove(file)

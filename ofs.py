@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Download and convert CBOFS NetCDF output to S-111 compliant HDF5."""
+"""Download and convert ROMS OFS NetCDF output to S-111 compliant HDF5."""
 import argparse
 import datetime
 import shutil
@@ -16,7 +16,7 @@ from s100ofs import s111
 # coordinates (thus a cell's width/height in meters will vary by latitude), and
 # since it will be adjusted in order to fit a whole number of grid cells in the
 # x and y directions within the calculated grid extent.
-TARGET_GRID_RESOLUTION_METERS = 500
+TARGET_GRID_RESOLUTION_METERS = 700
 
 PACKAGE = "s100ofs"
 PACKAGE_PATH = os.path.dirname(os.path.realpath(PACKAGE))
@@ -37,15 +37,16 @@ HTTP_SERVER_COOPS = "https://opendap.co-ops.nos.noaa.gov"
 # 'f012') will be injected by using str.format().
 # Example:
 #    reftime.strftime(HTTP_NETCDF_PATH_FORMAT).format(forecast_str='f012')
-HTTP_NETCDF_PATH_FORMAT = "/thredds/fileServer/NOAA/CBOFS/MODELS/%Y%m/nos.cbofs.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
+HTTP_NETCDF_PATH_FORMAT = "/thredds/fileServer/NOAA/{MODEL_str}/MODELS/%Y%m/nos.{model_str}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
 
 # Folder path of downloaded NetCDF files.
-LOCAL_NETCDF_PATH_FORMAT ="netcdf/nos.cbofs.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
+LOCAL_NETCDF_PATH_FORMAT ="netcdf/nos.{model_str}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
 
 # List of forecast projection hours to be processed
 FORECAST_HOURS = list(range(1,6))
+GOMOFS_FORECAST_HOURS = list(range(3,73))
 
-def download_and_process(index_file_path, s111_path, cycletime):
+def download_and_process(index_file_path, s111_path, cycletime, ofs_model):
     """Download latest model run and convert to S-111 format.
 
     Creates a list of paths to NetCDF files downloaded successfully, corresponding
@@ -75,20 +76,32 @@ def download_and_process(index_file_path, s111_path, cycletime):
     if not os.path.exists("{}/{}".format(PACKAGE_PATH, "h5")):
         os.makedirs("{}/{}".format(PACKAGE_PATH, "h5"))
 
-    local_files = []
-    for forecast in FORECAST_HOURS:
-        forecast_str = "f{0:03d}".format(forecast)
-        url = cycletime.strftime("{}{}".format(HTTP_SERVER_COOPS,HTTP_NETCDF_PATH_FORMAT)).format(forecast_str=forecast_str)
-        local_file = cycletime.strftime(LOCAL_NETCDF_PATH_FORMAT).format(forecast_str=forecast_str)
-        print("Downloading {} to {}...".format(url, local_file))
-        with urllib.request.urlopen(url) as response, open(local_file, "wb") as out_file:
-            shutil.copyfileobj(response, out_file)
-        print("Download successful.")
-        local_files.append(local_file)
+    if ofs_model == "gomofs":
+        local_files = []
+        for forecast in GOMOFS_FORECAST_HOURS:
+            forecast_str = "f{0:03d}".format(forecast)
+            url = cycletime.strftime("{}{}".format(HTTP_SERVER_COOPS,HTTP_NETCDF_PATH_FORMAT)).format(MODEL_str = str.upper(ofs_model), model_str = ofs_model, forecast_str=forecast_str)
+            local_file = cycletime.strftime(LOCAL_NETCDF_PATH_FORMAT).format(model_str = ofs_model, forecast_str=forecast_str)
+            print("Downloading {} to {}...".format(url, local_file))
+            with urllib.request.urlopen(url) as response, open(local_file, "wb") as out_file:
+                shutil.copyfileobj(response, out_file)
+            print("Download successful.")
+            local_files.append(local_file)
+    else:
+        local_files = []
+        for forecast in FORECAST_HOURS:
+            forecast_str = "f{0:03d}".format(forecast)
+            url = cycletime.strftime("{}{}".format(HTTP_SERVER_COOPS,HTTP_NETCDF_PATH_FORMAT)).format(MODEL_str = str.upper(ofs_model), model_str = ofs_model, forecast_str=forecast_str)
+            local_file = cycletime.strftime(LOCAL_NETCDF_PATH_FORMAT).format(model_str = ofs_model, forecast_str=forecast_str)
+            print("Downloading {} to {}...".format(url, local_file))
+            with urllib.request.urlopen(url) as response, open(local_file, "wb") as out_file:
+                shutil.copyfileobj(response, out_file)
+            print("Download successful.")
+            local_files.append(local_file)
 
     print("Converting files to S111 format...")
 
-    s111.romsToS111(index_file_path, local_files, s111_path, cycletime)
+    s111.romsToS111(index_file_path, local_files, s111_path, cycletime, ofs_model)
     print("Conversion complete.")
 
 def main():
@@ -98,7 +111,8 @@ def main():
     parser.add_argument('-s', '--s111_path', help='Path prefix of output S111 HDF5 file(s) (without file extension). Any required identifying information (e.g. model reference/cycle time, subgrid id) as well as the .h5 extension will be appended to create the final output path(s). Ignored if -b is specified.')
     parser.add_argument('-b', '--build_index', action='store_true', help='Build the regular grid index NetCDF file (WARNING: Takes up to ~12 hours). This file must be generated before processing any model output. Once created, it can be used indefinitely unless changes to the regular grid extent/resolution are required.')
     parser.add_argument('-g', '--grid_subset', action='store_true', help='Use grid subsetting to build index file when --build_index is specified. If not specified, the model extent will be used to generate the index file and no subsetting will occur.')
-    parser.add_argument("-m", "--model_output_files", metavar="roms_file_path", nargs="+", help="Path to one or more NetCDF files containing raw model output to be converted to S111 format or used to build an index file. If not specified, the latest model run will be downloaded and processed. Required when --build_index is specified.", required=False)
+    parser.add_argument('-m', '--model_output_files', metavar="roms_file_path", nargs="+", help="Path to one or more NetCDF files containing raw model output to be converted to S111 format or used to build an index file. If not specified, the latest model run will be downloaded and processed. Required when --build_index is specified.", required=False)
+    parser.add_argument('-o', '--ofs_model', help='Add name of ofs to download and process')
     args = parser.parse_args()
 
     # Cycletime representing model iniitalization (reference/cycle) time.
@@ -117,6 +131,10 @@ def main():
 
     print("Current time (UTC): {}".format(now))
     print("Processing forecast cycle with reference time (UTC): {}".format(cycletime))
+    
+    if not args.ofs_model:
+        parser.error("--ofs must be specified.")
+        return 1
 
     if not args.s111_path and not args.build_index:
         parser.error("Either --s111_path or --build_index must be specified.")
@@ -132,17 +150,17 @@ def main():
         if args.grid_subset:
             with roms.ROMSIndexFile(args.index_file_path) as index_file, \
                  roms.ROMSOutputFile(args.model_output_files[0]) as model_output_file:
-                index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, shoreline_shp=SHORELINE_SHP_PATH, subset_grid_shp=GRID_SUBSET_SHP_PATH)
+                index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, args.ofs_model, shoreline_shp=SHORELINE_SHP_PATH, subset_grid_shp=GRID_SUBSET_SHP_PATH)
         else:
             with roms.ROMSIndexFile(args.index_file_path) as index_file, \
                  roms.ROMSOutputFile(args.model_output_files[0]) as model_output_file:
-                index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, shoreline_shp=SHORELINE_SHP_PATH)    
+                index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, args.ofs_model, shoreline_shp=SHORELINE_SHP_PATH)    
 
     elif args.s111_path:
         if args.model_output_files is not None:
-            s111.romsToS111("{}/{}".format(PACKAGE_PATH, args.index_file_path), args.model_output_files,"{}/{}".format(PACKAGE_PATH, args.s111_path),cycletime)
+            s111.romsToS111("{}/{}".format(PACKAGE_PATH, args.index_file_path), args.model_output_files,"{}/{}".format(PACKAGE_PATH, args.s111_path),cycletime,args.ofs_model)
         else:
-            download_and_process("{}/{}".format(PACKAGE_PATH, args.index_file_path),"{}/{}".format(PACKAGE_PATH, args.s111_path), cycletime)
+            download_and_process("{}/{}".format(PACKAGE_PATH, args.index_file_path),"{}/{}".format(PACKAGE_PATH, args.s111_path), cycletime, args.ofs_model)
     return 0
 
 if __name__ == "__main__":

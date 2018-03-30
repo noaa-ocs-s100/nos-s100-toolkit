@@ -43,20 +43,23 @@ HTTP_NETCDF_PATH_FORMAT = "/thredds/fileServer/NOAA/CBOFS/MODELS/%Y%m/nos.cbofs.
 LOCAL_NETCDF_PATH_FORMAT ="netcdf/nos.cbofs.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
 
 # List of forecast projection hours to be processed
-FORECAST_HOURS = list(range(1,49))
+FORECAST_HOURS = list(range(1,6))
 
-def download(cycletime, forecasts):
-    """Download specified forecasts for specified model cycle time.
+def download_and_process(index_file_path, s111_path, cycletime):
+    """Download latest model run and convert to S-111 format.
+
+    Creates a list of paths to NetCDF files downloaded successfully, corresponding
+    with the order specified in `forecasts`.
 
     Args:
+        index_file_path: Path to NetCDF index file required for interpolation.
+        s111_path: Path prefix of output S111 HDF5 file(s).
         cycletime: `datetime.datetime` representing model intiialization
             (reference/cycle) time.
         forecasts: List of forecast projection hours to be downloaded.
 
-    Returns:
-        List of paths to NetCDF files downloaded successfully, corresponding
-        with the order specified in `forecasts`.
     """
+
     if not os.path.exists("{}/{}".format(PACKAGE_PATH, "netcdf")):
         os.makedirs("{}/{}".format(PACKAGE_PATH, "netcdf"))
     else:
@@ -73,7 +76,7 @@ def download(cycletime, forecasts):
         os.makedirs("{}/{}".format(PACKAGE_PATH, "h5"))
 
     local_files = []
-    for forecast in forecasts:
+    for forecast in FORECAST_HOURS:
         forecast_str = "f{0:03d}".format(forecast)
         url = cycletime.strftime("{}{}".format(HTTP_SERVER_COOPS,HTTP_NETCDF_PATH_FORMAT)).format(forecast_str=forecast_str)
         local_file = cycletime.strftime(LOCAL_NETCDF_PATH_FORMAT).format(forecast_str=forecast_str)
@@ -82,15 +85,23 @@ def download(cycletime, forecasts):
             shutil.copyfileobj(response, out_file)
         print("Download successful.")
         local_files.append(local_file)
-    return local_files
 
-def download_and_process(index_file_path, s111_path):
-    """Download latest model run and convert to S-111 format.
+    print("Converting files to S111 format...")
 
-    Args:
-        index_file_path: Path to NetCDF index file required for interpolation.
-        s111_path: Path prefix of output S111 HDF5 file(s).
-    """
+    s111.romsToS111(index_file_path, local_files, s111_path, cycletime)
+    print("Conversion complete.")
+
+def main():
+    """Parse command line arguments and execute target functions."""
+    parser = argparse.ArgumentParser(description='Create or modify S-111 File')
+    parser.add_argument('index_file_path', help='Path to regular grid index netcdf file used to add model output to the S111 HDF5 file, or to be created when --build_index is specified.')
+    parser.add_argument('-s', '--s111_path', help='Path prefix of output S111 HDF5 file(s) (without file extension). Any required identifying information (e.g. model reference/cycle time, subgrid id) as well as the .h5 extension will be appended to create the final output path(s). Ignored if -b is specified.')
+    parser.add_argument('-b', '--build_index', action='store_true', help='Build the regular grid index NetCDF file (WARNING: Takes up to ~12 hours). This file must be generated before processing any model output. Once created, it can be used indefinitely unless changes to the regular grid extent/resolution are required.')
+    parser.add_argument('-g', '--grid_subset', action='store_true', help='Use grid subsetting to build index file when --build_index is specified. If not specified, the model extent will be used to generate the index file and no subsetting will occur.')
+    parser.add_argument("-m", "--model_output_files", metavar="roms_file_path", nargs="+", help="Path to one or more NetCDF files containing raw model output to be converted to S111 format or used to build an index file. If not specified, the latest model run will be downloaded and processed. Required when --build_index is specified.", required=False)
+    args = parser.parse_args()
+
+    # Cycletime representing model iniitalization (reference/cycle) time.
     now = datetime.datetime.utcnow()
     if now.hour < 2 and now.minute < 50:
         yesterday = now - datetime.timedelta(days=1)
@@ -103,24 +114,9 @@ def download_and_process(index_file_path, s111_path):
         cycletime = datetime.datetime(now.year, now.month, now.day, 12, 0)
     else:
         cycletime = datetime.datetime(now.year, now.month, now.day, 18, 0)
-    
+
     print("Current time (UTC): {}".format(now))
     print("Processing forecast cycle with reference time (UTC): {}".format(cycletime))
-
-    model_output_files = download(cycletime, FORECAST_HOURS)
-    print("Converting files to S111 format...")
-    s111.romsToS111(index_file_path, model_output_files, s111_path, cycletime)
-    print("Conversion complete.")
-
-def main():
-    """Parse command line arguments and execute target functions."""
-    parser = argparse.ArgumentParser(description='Create or modify S-111 File')
-    parser.add_argument('index_file_path', help='Path to regular grid index netcdf file used to add model output to the S111 HDF5 file, or to be created when --build_index is specified.')
-    parser.add_argument('-s', '--s111_path', help='Path prefix of output S111 HDF5 file(s) (without file extension). Any required identifying information (e.g. model reference/cycle time, subgrid id) as well as the .h5 extension will be appended to create the final output path(s). Ignored if -b is specified.')
-    parser.add_argument('-b', '--build_index', action='store_true', help='Build the regular grid index NetCDF file (WARNING: Takes up to ~12 hours). This file must be generated before processing any model output. Once created, it can be used indefinitely unless changes to the regular grid extent/resolution are required.')
-    parser.add_argument('-g', '--grid_subset', action='store_true', help='Use grid subsetting to build index file when --build_index is specified. If not specified, the model extent will be used to generate the index file and no subsetting will occur.')
-    parser.add_argument("-m", "--model_output_files", metavar="roms_file_path", nargs="+", help="Path to one or more NetCDF files containing raw model output to be converted to S111 format or used to build an index file. If not specified, the latest model run will be downloaded and processed. Required when --build_index is specified.", required=False)
-    args = parser.parse_args()
 
     if not args.s111_path and not args.build_index:
         parser.error("Either --s111_path or --build_index must be specified.")
@@ -134,7 +130,6 @@ def main():
             return 1
         grid_subset = None
         if args.grid_subset:
-            #grid_subset = GRID_SUBSET_SHP_PATH
             with roms.ROMSIndexFile(args.index_file_path) as index_file, \
                  roms.ROMSOutputFile(args.model_output_files[0]) as model_output_file:
                 index_file.init_nc(model_output_file, TARGET_GRID_RESOLUTION_METERS, shoreline_shp=SHORELINE_SHP_PATH, subset_grid_shp=GRID_SUBSET_SHP_PATH)
@@ -145,9 +140,9 @@ def main():
 
     elif args.s111_path:
         if args.model_output_files is not None:
-            s111.romsToS111("{}/{}".format(PACKAGE_PATH, args.index_file_path), args.model_output_files,"{}/{}".format(PACKAGE_PATH, args.s111_path))
+            s111.romsToS111("{}/{}".format(PACKAGE_PATH, args.index_file_path), args.model_output_files,"{}/{}".format(PACKAGE_PATH, args.s111_path),cycletime)
         else:
-            download_and_process("{}/{}".format(PACKAGE_PATH, args.index_file_path),"{}/{}".format(PACKAGE_PATH, args.s111_path))
+            download_and_process("{}/{}".format(PACKAGE_PATH, args.index_file_path),"{}/{}".format(PACKAGE_PATH, args.s111_path), cycletime)
     return 0
 
 if __name__ == "__main__":

@@ -11,14 +11,6 @@ import sys
 from s100ofs.model import roms
 from s100ofs import s111
 
-# Path to shoreline shapefile used to mask out land areas during index file
-# creation.
-SHORELINE_SHP_PATH = "shp/nos80k.shp"
-
-# Path to grid subset shapefile used to identify subgrid areas during index
-# file creation.
-GRID_SUBSET_SHP_PATH = "shp/grids_160k.shp"
-
 # Base URL of CO-OPS HTTP server for NetCDF files
 HTTP_SERVER_COOPS = "https://opendap.co-ops.nos.noaa.gov"
 
@@ -165,7 +157,8 @@ def main():
     parser.add_argument("-i", "--index_file_path", help="Path to existing or to-be-created index netcdf file. This file contains regular grid definition and interpolation parameters, and is required to convert model output to S111 HDF5 format. If -b/--build_index is specified, any existing file at the specified path will be overwritten.", required=True)
     parser.add_argument("-s", "--s111_dir", help="Path to a directory where generated S-111 HDF5 file(s) will be generated. Generated files will be placed in a subdirectory named to match the model identifier (e.g. 'cbofs') and files will be auto-named using identifying information (e.g. model reference/cycle time, subgrid id) and with the .h5 file extension. Ignored if -b/--build_index is specified.")
     parser.add_argument("-b", "--build_index", action="store_true", help="Build a new index NetCDF file at the path specified by -i/--index_file_path. This file must be generated before processing any model output, as it will contain the regular grid definition and interpolation parameters. Once created, it can be used indefinitely for the target model unless changes to the regular grid extent/resolution are required or if the underlying model grid changes.")
-    parser.add_argument("-g", "--grid_subset", action="store_true", help="Use grid subsetting to build index file when -b/--build_index is specified. If not specified, the model extent will be used to generate the index file and no subsetting will occur. Ignored if -b/--build_index is not specified.")
+    parser.add_argument("-g", "--grid_shp", help="Path to a polygon grid shapefile that will be used to generate matching subgrids when generating an index file. Only used when -b/--build_index is specified. If not specified, the model extent will be used to generate the index file and no subsetting will occur. Ignored if -b/--build_index is not specified.")
+    parser.add_argument("-l", "--land_shp", help="Path to a land/shoreline polygon shapefile that will be used to apply a detailed land mask when generating an index file. Only used when -b/--build_index is specified. If not specified, the grid mask will be determined by the model's own mask, which may be less detailed. Ignored if -b/--build_index is not specified.")
     parser.add_argument("-m", "--model_file_path", nargs="+", help="Path to one or more NetCDF files containing raw/native model output to be converted to S111 format (when -s/--s111_dir is specified) or used to build an index file (when -b/--build_index is specified). If not specified, the latest model run will be automatically downloaded and processed. Required when --build_index is specified.", required=False)
     parser.add_argument("-d", "--download_dir", help="Path to a directory where downloaded model output files can be placed. Files will be downloaded into a subdirectory named to match the model identifier (e.g. 'cbofs') (if it does not yet exist, it will be created). Prior to downloading, any existing NetCDF files in the model's subdirectory will be deleted to prevent file accumulation. Required when -m/--model_file_path is not specified.")
     parser.add_argument("-o", "--ofs_model", help="Identifier of target Operational Forecast System (OFS) to be processed (e.g. cbofs, dbofs, gomofs, or tbofs)", required=True)
@@ -208,15 +201,16 @@ def main():
             parser.error("At least one model output file must be specified with --model_file_path when --build_index is specified.")
             print(args)
             return 1
-        grid_subset = None
-        if args.grid_subset:
-            with roms.ROMSIndexFile(args.index_file_path) as index_file, \
-                 roms.ROMSOutputFile(args.model_file_path[0]) as model_output_file:
-                index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model, shoreline_shp=SHORELINE_SHP_PATH, subset_grid_shp=GRID_SUBSET_SHP_PATH)
-        else:
-            with roms.ROMSIndexFile(args.index_file_path) as index_file, \
-                 roms.ROMSOutputFile(args.model_file_path[0]) as model_output_file:
-                index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model, shoreline_shp=SHORELINE_SHP_PATH)
+        if args.grid_shp is not None and not os.path.isfile(args.grid_shp):
+            parser.error("Specified grid shapefile does not exist [{}]".format(args.grid_shp))
+            return 1
+        if args.land_shp is not None and not os.path.isfile(args.land_shp):
+            parser.error("Specified land/shoreline shapefile does not exist [{}]".format(args.land_shp))
+            return 1
+        
+        with roms.ROMSIndexFile(args.index_file_path) as index_file, \
+             roms.ROMSOutputFile(args.model_file_path[0]) as model_output_file:
+            index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model, shoreline_shp=args.land_shp, subset_grid_shp=args.grid_shp)
 
     elif not os.path.isdir(args.s111_dir):
         parser.error("Invalid/missing S-111 output directory (-s/-s111_dir) specified.")

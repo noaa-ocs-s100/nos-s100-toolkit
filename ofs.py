@@ -54,25 +54,25 @@ MODELS = {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1,49)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=170),
+        "file_delay": datetime.timedelta(minutes=170)
     },
     "gomofs": {
         # 3-hourly output from +3 to +72
         "forecast_hours": list(range(3,73,3)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=170),
+        "file_delay": datetime.timedelta(minutes=170)
     },
     "dbofs": {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1,49)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=170),
+        "file_delay": datetime.timedelta(minutes=170)
     },
     "tbofs": {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1,49)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=170),
+        "file_delay": datetime.timedelta(minutes=170)
     }
 }
 

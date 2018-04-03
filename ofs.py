@@ -52,17 +52,27 @@ and value is another dictionary with the following properties:
 MODELS = {
     "cbofs": {
         # Hourly output from +1 to +48
-        "forecast_hours": list(range(1,2)),#49)),
+        "forecast_hours": list(range(1,49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=170),
-        "target_cellsize_meters": 500
     },
     "gomofs": {
         # 3-hourly output from +3 to +72
         "forecast_hours": list(range(3,73,3)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=170),
-        "target_cellsize_meters": 700
+    },
+    "dbofs": {
+        # Hourly output from +1 to +48
+        "forecast_hours": list(range(1,49)),
+        "cycles": (0, 6, 12, 18),
+        "file_delay": datetime.timedelta(minutes=170),
+    },
+    "tbofs": {
+        # Hourly output from +1 to +48
+        "forecast_hours": list(range(1,49)),
+        "cycles": (0, 6, 12, 18),
+        "file_delay": datetime.timedelta(minutes=170),
     }
 }
 
@@ -158,8 +168,9 @@ def main():
     parser.add_argument("-g", "--grid_subset", action="store_true", help="Use grid subsetting to build index file when -b/--build_index is specified. If not specified, the model extent will be used to generate the index file and no subsetting will occur. Ignored if -b/--build_index is not specified.")
     parser.add_argument("-m", "--model_file_path", nargs="+", help="Path to one or more NetCDF files containing raw/native model output to be converted to S111 format (when -s/--s111_dir is specified) or used to build an index file (when -b/--build_index is specified). If not specified, the latest model run will be automatically downloaded and processed. Required when --build_index is specified.", required=False)
     parser.add_argument("-d", "--download_dir", help="Path to a directory where downloaded model output files can be placed. Files will be downloaded into a subdirectory named to match the model identifier (e.g. 'cbofs') (if it does not yet exist, it will be created). Prior to downloading, any existing NetCDF files in the model's subdirectory will be deleted to prevent file accumulation. Required when -m/--model_file_path is not specified.")
-    parser.add_argument("-o", "--ofs_model", help="Identifier of target Operational Forecast System (OFS) to be processed (e.g. cbofs, dbofs, gomofs, etc.)", required=True)
+    parser.add_argument("-o", "--ofs_model", help="Identifier of target Operational Forecast System (OFS) to be processed (e.g. cbofs, dbofs, gomofs, or tbofs)", required=True)
     parser.add_argument("-c", "--cycletime", help="Model cycle time (i.e. initialization/reference time) to process, in the format YYYYMMDDHH. If not specified, the most recent cycle will be calculated using configured thresholds and present system time.")
+    parser.add_argument("-t", "--target_cellsize_meters", help=" Target cellsize of regular grid cells in meters. Actual size of x/y grid cells will vary slightly, since the regular grid uses lat/lon coordinates (thus a cell's width/height in meters will vary by latitude), and since it will be adjusted in order to fit a whole number of grid cells in the x and y directions within the calculated grid extent.")
     args = parser.parse_args()
 
     ofs_model = args.ofs_model
@@ -189,6 +200,10 @@ def main():
     print("Processing forecast cycle with reference time (UTC): {}".format(cycletime))
     
     if args.build_index:
+        if args.target_cellsize_meters is None:
+            parser.error("Target cellsize in meters must be specfied when --build_index is specified.")
+            print(args)
+            return 1
         if args.model_file_path is None:
             parser.error("At least one model output file must be specified with --model_file_path when --build_index is specified.")
             print(args)
@@ -197,11 +212,11 @@ def main():
         if args.grid_subset:
             with roms.ROMSIndexFile(args.index_file_path) as index_file, \
                  roms.ROMSOutputFile(args.model_file_path[0]) as model_output_file:
-                index_file.init_nc(model_output_file, MODELS[ofs_model]["target_cellsize_meters"], args.ofs_model, shoreline_shp=SHORELINE_SHP_PATH, subset_grid_shp=GRID_SUBSET_SHP_PATH)
+                index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model, shoreline_shp=SHORELINE_SHP_PATH, subset_grid_shp=GRID_SUBSET_SHP_PATH)
         else:
             with roms.ROMSIndexFile(args.index_file_path) as index_file, \
                  roms.ROMSOutputFile(args.model_file_path[0]) as model_output_file:
-                index_file.init_nc(model_output_file, MODELS[ofs_model]["target_cellsize_meters"], args.ofs_model, shoreline_shp=SHORELINE_SHP_PATH)    
+                index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model, shoreline_shp=SHORELINE_SHP_PATH)
 
     elif not os.path.isdir(args.s111_dir):
         parser.error("Invalid/missing S-111 output directory (-s/-s111_dir) specified.")

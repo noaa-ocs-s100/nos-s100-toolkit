@@ -7,6 +7,7 @@ import urllib.request
 import os
 from glob import glob
 import sys
+import numpy
 
 from s100ofs.model import roms
 from s100ofs import s111
@@ -22,7 +23,7 @@ HTTP_SERVER_COOPS = "https://opendap.co-ops.nos.noaa.gov"
 HTTP_NETCDF_PATH_FORMAT = "/thredds/fileServer/NOAA/{model_str_uc}/MODELS/%Y%m/nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
 
 # Folder path of downloaded NetCDF files.
-LOCAL_NETCDF_FILENAME_FORMAT ="nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
+LOCAL_NETCDF_FILENAME_FORMAT = "nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
 
 """
 Model configuration dictionary, where key is the lower-case model identifier
@@ -68,6 +69,7 @@ MODELS = {
     }
 }
 
+
 def get_latest_cycletime(ofs_model):
     """Calculate and return the latest cycletime for specified model.
 
@@ -104,7 +106,8 @@ def get_latest_cycletime(ofs_model):
 
     return cycletime
 
-def download_and_process(ofs_model, index_file_path, s111_dir, cycletime, download_dir):
+
+def download_and_process(ofs_model, s111_info, index_file_path, s111_dir, cycletime, download_dir):
     """Download latest model run and convert to S-111 format.
 
     Creates a list of paths to NetCDF files downloaded successfully, corresponding
@@ -131,10 +134,10 @@ def download_and_process(ofs_model, index_file_path, s111_dir, cycletime, downlo
     else:
         # Clean the directory of all data files before downloading and
         # processing the new data:
-        filesToDelete = glob("{}/*.nc".format(download_dir))
-        for fileToDelete in filesToDelete:
-            sys.stderr.write("Removing {0}\n".format(fileToDelete))
-            os.remove(fileToDelete)
+        delete_files = glob("{}/*.nc".format(download_dir))
+        for delete_files in delete_files:
+            sys.stderr.write("Removing {0}\n".format(delete_files))
+            os.remove(delete_files)
 
     local_files = []
     for forecast in MODELS[ofs_model]["forecast_hours"]:
@@ -148,8 +151,33 @@ def download_and_process(ofs_model, index_file_path, s111_dir, cycletime, downlo
         local_files.append(local_file)
 
     print("Converting files to S111 format...")
-    s111.romsToS111(index_file_path, local_files, s111_dir, cycletime, ofs_model)
+    s111.romsToS111(index_file_path, local_files, s111_dir, cycletime, ofs_model, s111_info)
     print("Conversion complete.")
+
+
+def s111_metadata(ofs_model):
+
+    if ofs_model == "cbofs":
+        ofs_region = numpy.string_('Chesapeake_Bay')
+
+    elif ofs_model == "dbofs":
+        ofs_region = numpy.string_('Delaware_Bay')
+
+    elif ofs_model == "tbofs":
+        ofs_region = numpy.string_('Tampa_Bay')
+
+    elif ofs_model == "gomofs":
+        ofs_region = numpy.string_('Gulf_of_Maine')
+
+    product_specification = numpy.string_('INT.IHO.S-111.1.0.0')
+    current_product_method = numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
+    epoch = numpy.string_('G1762')
+    horizontal_datum = numpy.string_('EPSG')
+    horizontal_datum_value = 4326
+    s111_info = [ofs_region, product_specification, current_product_method, epoch, horizontal_datum, horizontal_datum_value]
+
+    return s111_info
+
 
 def main():
     """Parse command line arguments and execute target functions."""
@@ -194,7 +222,7 @@ def main():
     
     if args.build_index:
         if args.target_cellsize_meters is None:
-            parser.error("Target cellsize in meters must be specfied when --build_index is specified.")
+            parser.error("Target cellsize in meters must be specified when --build_index is specified.")
             print(args)
             return 1
         if args.model_file_path is None:
@@ -216,6 +244,7 @@ def main():
         parser.error("Invalid/missing S-111 output directory (-s/-s111_dir) specified.")
         return 1
     else:
+        s111_info = s111_metadata(ofs_model)
         if not os.path.exists(args.index_file_path):
             parser.error("Specified index file does not exist [{}]".format(args.index_file_path))
             return 1
@@ -226,12 +255,12 @@ def main():
         if not os.path.isdir(s111_dir):
             os.makedirs(s111_dir)
         if args.model_file_path is not None:
-            s111.romsToS111(args.index_file_path, args.model_file_path, s111_dir, cycletime, ofs_model)
+            s111.romsToS111(args.index_file_path, args.model_file_path, s111_dir, cycletime, ofs_model, s111_info)
         else:
             if not args.download_dir or not os.path.isdir(args.download_dir):
                 parser.error("Invalid/missing download directory (-d/--download_dir) specified.")
                 return 1
-            download_and_process(ofs_model, args.index_file_path, s111_dir, cycletime, args.download_dir)
+            download_and_process(ofs_model, s111_info, args.index_file_path, s111_dir, cycletime, args.download_dir)
     return 0
 
 if __name__ == "__main__":

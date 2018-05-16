@@ -41,29 +41,29 @@ and value is another dictionary with the following properties:
         will vary by latitude), and since it will be adjusted in order to fit a
         whole number of grid cells in the x and y directions within the
         calculated grid extent.
-""" 
+"""
 MODELS = {
     "cbofs": {
         # Hourly output from +1 to +48
-        "forecast_hours": list(range(1,49)),
+        "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=170)
     },
     "gomofs": {
         # 3-hourly output from +3 to +72
-        "forecast_hours": list(range(3,73,3)),
+        "forecast_hours": list(range(3, 73, 3)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=170)
     },
     "dbofs": {
         # Hourly output from +1 to +48
-        "forecast_hours": list(range(1,49)),
+        "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=170)
     },
     "tbofs": {
         # Hourly output from +1 to +48
-        "forecast_hours": list(range(1,49)),
+        "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=170)
     }
@@ -95,7 +95,8 @@ def get_latest_cycletime(ofs_model):
     today_cycletimes = sorted([datetime.datetime(now.year, now.month, now.day, cycle) for cycle in cycles])
 
     # Include yesterday's cycles as potential cycles to check
-    potential_cycletimes = [today_cycletime - datetime.timedelta(days=1) for today_cycletime in today_cycletimes] + today_cycletimes
+    potential_cycletimes = [today_cycletime - datetime.timedelta(days=1) for today_cycletime in
+                            today_cycletimes] + today_cycletimes
 
     # Now search through potential cycle times in reverse chronological
     # order until we find one that should be available
@@ -115,10 +116,11 @@ def download_and_process(ofs_model, s111_info, index_file_path, s111_dir, cyclet
 
     Args:
         ofs_model: The target model identifier.
+        s111_info: Target model metadata.
         index_file_path: Path to NetCDF index file required for interpolation.
         s111_dir: Path to a parent directory where output S111 HDF5 file(s)
             will be generated. Must exist.
-        cycletime: `datetime.datetime` representing model intiialization
+        cycletime: `datetime.datetime` representing model initialization
             (reference/cycle) time.
         download_dir: Path to a parent directory where model output files will
             be downloaded. Must exist. Files will be downloaded to a
@@ -142,8 +144,10 @@ def download_and_process(ofs_model, s111_info, index_file_path, s111_dir, cyclet
     local_files = []
     for forecast in MODELS[ofs_model]["forecast_hours"]:
         forecast_str = "f{0:03d}".format(forecast)
-        url = cycletime.strftime("{}{}".format(HTTP_SERVER_COOPS, HTTP_NETCDF_PATH_FORMAT)).format(model_str_uc=ofs_model.upper(), model_str_lc=ofs_model.lower(), forecast_str=forecast_str)
-        local_file = "{}/{}".format(download_dir, cycletime.strftime(LOCAL_NETCDF_FILENAME_FORMAT).format(model_str_lc=ofs_model.lower(), forecast_str=forecast_str))
+        url = cycletime.strftime("{}{}".format(HTTP_SERVER_COOPS, HTTP_NETCDF_PATH_FORMAT)).format(
+            model_str_uc=ofs_model.upper(), model_str_lc=ofs_model.lower(), forecast_str=forecast_str)
+        local_file = "{}/{}".format(download_dir, cycletime.strftime(LOCAL_NETCDF_FILENAME_FORMAT).format(
+            model_str_lc=ofs_model.lower(), forecast_str=forecast_str))
         print("Downloading {} to {}...".format(url, local_file))
         with urllib.request.urlopen(url) as response, open(local_file, "wb") as out_file:
             shutil.copyfileobj(response, out_file)
@@ -151,11 +155,18 @@ def download_and_process(ofs_model, s111_info, index_file_path, s111_dir, cyclet
         local_files.append(local_file)
 
     print("Converting files to S111 format...")
-    s111.romsToS111(index_file_path, local_files, s111_dir, cycletime, ofs_model, s111_info)
+    s111.roms_to_s111(index_file_path, local_files, s111_dir, cycletime, ofs_model, s111_info)
     print("Conversion complete.")
 
 
 def s111_metadata(ofs_model):
+    """Collect target model metadata to pass to s111 module.
+
+        Creates a list of model and s111 attributes.
+
+        Args:
+            ofs_model: The target model identifier.
+    """
 
     if ofs_model == "cbofs":
         ofs_region = numpy.string_('Chesapeake_Bay')
@@ -174,7 +185,8 @@ def s111_metadata(ofs_model):
     epoch = numpy.string_('G1762')
     horizontal_datum = numpy.string_('EPSG')
     horizontal_datum_value = 4326
-    s111_info = [ofs_region, product_specification, current_product_method, epoch, horizontal_datum, horizontal_datum_value]
+    s111_info = [ofs_region, product_specification, current_product_method, epoch, horizontal_datum,
+                 horizontal_datum_value]
 
     return s111_info
 
@@ -196,7 +208,8 @@ def main():
 
     ofs_model = args.ofs_model
     if not ofs_model or ofs_model.lower() not in MODELS:
-        parser.error("A valid -o/--ofs_model must be specified. Possible values: {}".format(", ".join(list(MODELS.keys()))))
+        parser.error(
+            "A valid -o/--ofs_model must be specified. Possible values: {}".format(", ".join(list(MODELS.keys()))))
         return 1
     ofs_model = ofs_model.lower()
 
@@ -215,18 +228,20 @@ def main():
     else:
         cycletime = get_latest_cycletime(ofs_model)
         if cycletime is None:
-            print("Error: Latest model cycle time cannot be determined. Verify that system time is correct and review model cycle configuration.")
+            print(
+                "Error: Latest model cycle time cannot be determined. Verify that system time is correct and review model cycle configuration.")
             return 1
-        
+
     print("Processing forecast cycle with reference time (UTC): {}".format(cycletime))
-    
+
     if args.build_index:
         if args.target_cellsize_meters is None:
             parser.error("Target cellsize in meters must be specified when --build_index is specified.")
             print(args)
             return 1
         if args.model_file_path is None:
-            parser.error("At least one model output file must be specified with --model_file_path when --build_index is specified.")
+            parser.error(
+                "At least one model output file must be specified with --model_file_path when --build_index is specified.")
             print(args)
             return 1
         if args.grid_shp is not None and not os.path.isfile(args.grid_shp):
@@ -235,9 +250,9 @@ def main():
         if args.land_shp is not None and not os.path.isfile(args.land_shp):
             parser.error("Specified land/shoreline shapefile does not exist [{}]".format(args.land_shp))
             return 1
-        
+
         with roms.ROMSIndexFile(args.index_file_path) as index_file, \
-             roms.ROMSOutputFile(args.model_file_path[0]) as model_output_file:
+                roms.ROMSOutputFile(args.model_file_path[0]) as model_output_file:
             index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model, shoreline_shp=args.land_shp, subset_grid_shp=args.grid_shp)
 
     elif not os.path.isdir(args.s111_dir):
@@ -255,7 +270,7 @@ def main():
         if not os.path.isdir(s111_dir):
             os.makedirs(s111_dir)
         if args.model_file_path is not None:
-            s111.romsToS111(args.index_file_path, args.model_file_path, s111_dir, cycletime, ofs_model, s111_info)
+            s111.roms_to_s111(args.index_file_path, args.model_file_path, s111_dir, cycletime, ofs_model, s111_info)
         else:
             if not args.download_dir or not os.path.isdir(args.download_dir):
                 parser.error("Invalid/missing download directory (-d/--download_dir) specified.")
@@ -263,6 +278,6 @@ def main():
             download_and_process(ofs_model, s111_info, args.index_file_path, s111_dir, cycletime, args.download_dir)
     return 0
 
+
 if __name__ == "__main__":
     main()
-

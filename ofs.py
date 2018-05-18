@@ -253,7 +253,8 @@ def main():
 
         with roms.ROMSIndexFile(args.index_file_path) as index_file, \
                 roms.ROMSOutputFile(args.model_file_path[0]) as model_output_file:
-            index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model, shoreline_shp=args.land_shp, subset_grid_shp=args.grid_shp)
+            index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model,
+                               shoreline_shp=args.land_shp, subset_grid_shp=args.grid_shp)
 
     elif not os.path.isdir(args.s111_dir):
         parser.error("Invalid/missing S-111 output directory (-s/-s111_dir) specified.")

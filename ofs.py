@@ -47,25 +47,33 @@ MODELS = {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=170)
+        "file_delay": datetime.timedelta(minutes=170),
+        "region": numpy.string_('Chesapeake_Bay'),
+        "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
     },
     "gomofs": {
         # 3-hourly output from +3 to +72
         "forecast_hours": list(range(3, 73, 3)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=170)
+        "file_delay": datetime.timedelta(minutes=170),
+        "region": numpy.string_('Gulf_of_Maine'),
+        "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
     },
     "dbofs": {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=170)
+        "file_delay": datetime.timedelta(minutes=170),
+        "region": numpy.string_('Delaware_Bay'),
+        "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
     },
     "tbofs": {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=170)
+        "file_delay": datetime.timedelta(minutes=170),
+        "region": numpy.string_('Tampa_Bay'),
+        "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
     }
 }
 
@@ -108,7 +116,7 @@ def get_latest_cycletime(ofs_model):
     return cycletime
 
 
-def download_and_process(ofs_model, s111_info, index_file_path, s111_dir, cycletime, download_dir):
+def download_and_process(ofs_model, ofs_product, ofs_region, index_file_path, s111_dir, cycletime, download_dir):
     """Download latest model run and convert to S-111 format.
 
     Creates a list of paths to NetCDF files downloaded successfully, corresponding
@@ -116,7 +124,8 @@ def download_and_process(ofs_model, s111_info, index_file_path, s111_dir, cyclet
 
     Args:
         ofs_model: The target model identifier.
-        s111_info: Target model metadata.
+        ofs_region: Geographic indentifier metadata.
+        ofs_product: Model description and type of forecast metadata.
         index_file_path: Path to NetCDF index file required for interpolation.
         s111_dir: Path to a parent directory where output S111 HDF5 file(s)
             will be generated. Must exist.
@@ -155,40 +164,8 @@ def download_and_process(ofs_model, s111_info, index_file_path, s111_dir, cyclet
         local_files.append(local_file)
 
     print("Converting files to S111 format...")
-    s111.roms_to_s111(index_file_path, local_files, s111_dir, cycletime, ofs_model, s111_info)
+    s111.roms_to_s111(index_file_path, local_files, s111_dir, cycletime, ofs_model, ofs_product, ofs_region)
     print("Conversion complete.")
-
-
-def s111_metadata(ofs_model):
-    """Collect target model metadata to pass to s111 module.
-
-        Creates a list of model and s111 attributes.
-
-        Args:
-            ofs_model: The target model identifier.
-    """
-
-    if ofs_model == "cbofs":
-        ofs_region = numpy.string_('Chesapeake_Bay')
-
-    elif ofs_model == "dbofs":
-        ofs_region = numpy.string_('Delaware_Bay')
-
-    elif ofs_model == "tbofs":
-        ofs_region = numpy.string_('Tampa_Bay')
-
-    elif ofs_model == "gomofs":
-        ofs_region = numpy.string_('Gulf_of_Maine')
-
-    product_specification = numpy.string_('INT.IHO.S-111.1.0.0')
-    current_product_method = numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
-    epoch = numpy.string_('G1762')
-    horizontal_datum = numpy.string_('EPSG')
-    horizontal_datum_value = 4326
-    s111_info = [ofs_region, product_specification, current_product_method, epoch, horizontal_datum,
-                 horizontal_datum_value]
-
-    return s111_info
 
 
 def main():
@@ -208,8 +185,7 @@ def main():
 
     ofs_model = args.ofs_model
     if not ofs_model or ofs_model.lower() not in MODELS:
-        parser.error(
-            "A valid -o/--ofs_model must be specified. Possible values: {}".format(", ".join(list(MODELS.keys()))))
+        parser.error("A valid -o/--ofs_model must be specified. Possible values: {}".format(", ".join(list(MODELS.keys()))))
         return 1
     ofs_model = ofs_model.lower()
 
@@ -228,8 +204,7 @@ def main():
     else:
         cycletime = get_latest_cycletime(ofs_model)
         if cycletime is None:
-            print(
-                "Error: Latest model cycle time cannot be determined. Verify that system time is correct and review model cycle configuration.")
+            print("Error: Latest model cycle time cannot be determined. Verify that system time is correct and review model cycle configuration.")
             return 1
 
     print("Processing forecast cycle with reference time (UTC): {}".format(cycletime))
@@ -240,8 +215,7 @@ def main():
             print(args)
             return 1
         if args.model_file_path is None:
-            parser.error(
-                "At least one model output file must be specified with --model_file_path when --build_index is specified.")
+            parser.error("At least one model output file must be specified with --model_file_path when --build_index is specified.")
             print(args)
             return 1
         if args.grid_shp is not None and not os.path.isfile(args.grid_shp):
@@ -253,13 +227,15 @@ def main():
 
         with roms.ROMSIndexFile(args.index_file_path) as index_file, \
                 roms.ROMSOutputFile(args.model_file_path[0]) as model_output_file:
-            index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model, shoreline_shp=args.land_shp, subset_grid_shp=args.grid_shp)
+            index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model,
+                               shoreline_shp=args.land_shp, subset_grid_shp=args.grid_shp)
 
     elif not os.path.isdir(args.s111_dir):
         parser.error("Invalid/missing S-111 output directory (-s/-s111_dir) specified.")
         return 1
     else:
-        s111_info = s111_metadata(ofs_model)
+        ofs_region = MODELS[ofs_model]["region"]
+        ofs_product = MODELS[ofs_model]["current_product_method"]
         if not os.path.exists(args.index_file_path):
             parser.error("Specified index file does not exist [{}]".format(args.index_file_path))
             return 1
@@ -270,12 +246,12 @@ def main():
         if not os.path.isdir(s111_dir):
             os.makedirs(s111_dir)
         if args.model_file_path is not None:
-            s111.roms_to_s111(args.index_file_path, args.model_file_path, s111_dir, cycletime, ofs_model, s111_info)
+            s111.roms_to_s111(args.index_file_path, args.model_file_path, s111_dir, cycletime, ofs_model, ofs_product, ofs_region)
         else:
             if not args.download_dir or not os.path.isdir(args.download_dir):
                 parser.error("Invalid/missing download directory (-d/--download_dir) specified.")
                 return 1
-            download_and_process(ofs_model, s111_info, args.index_file_path, s111_dir, cycletime, args.download_dir)
+            download_and_process(ofs_model, ofs_product, ofs_region, args.index_file_path, s111_dir, cycletime, args.download_dir)
     return 0
 
 

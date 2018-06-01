@@ -124,7 +124,7 @@ def download_and_process(ofs_model, ofs_product, ofs_region, index_file_path, s1
 
     Args:
         ofs_model: The target model identifier.
-        ofs_region: Geographic indentifier metadata.
+        ofs_region: Geographic identifier metadata.
         ofs_product: Model description and type of forecast metadata.
         index_file_path: Path to NetCDF index file required for interpolation.
         s111_dir: Path to a parent directory where output S111 HDF5 file(s)

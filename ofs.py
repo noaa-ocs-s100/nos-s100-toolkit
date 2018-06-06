@@ -12,15 +12,15 @@ import numpy
 from s100ofs.model import roms
 from s100ofs import s111
 
-# Base URL of CO-OPS HTTP server for NetCDF files
-HTTP_SERVER_COOPS = "https://opendap.co-ops.nos.noaa.gov"
+# Base URL of NCEP NOMADS HTTP for accessing CO-OPS OFS NetCDF files
+HTTP_SERVER_NOMADS = "http://nomads.ncep.noaa.gov"
 
 # Path format of NetCDF files. Forecast initialization (reference) time will be
 # injected using datetime.strftime() and zero-padded forecast designation (e.g.
 # 'f012') will be injected by using str.format().
 # Example:
 #    reftime.strftime(HTTP_NETCDF_PATH_FORMAT).format(forecast_str='f012')
-HTTP_NETCDF_PATH_FORMAT = "/thredds/fileServer/NOAA/{model_str_uc}/MODELS/%Y%m/nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
+HTTP_NETCDF_PATH_FORMAT = "/pub/data/nccf/com/nos/prod/{model_str_uc}.%Y%m%d/nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
 
 # Folder path of downloaded NetCDF files.
 LOCAL_NETCDF_FILENAME_FORMAT = "nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
@@ -47,7 +47,7 @@ MODELS = {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=170),
+        "file_delay": datetime.timedelta(minutes=110),
         "region": numpy.string_('Chesapeake_Bay'),
         "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
     },
@@ -55,7 +55,7 @@ MODELS = {
         # 3-hourly output from +3 to +72
         "forecast_hours": list(range(3, 73, 3)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=170),
+        "file_delay": datetime.timedelta(minutes=150),
         "region": numpy.string_('Gulf_of_Maine'),
         "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
     },
@@ -63,7 +63,7 @@ MODELS = {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=170),
+        "file_delay": datetime.timedelta(minutes=110),
         "region": numpy.string_('Delaware_Bay'),
         "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
     },
@@ -71,7 +71,7 @@ MODELS = {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=170),
+        "file_delay": datetime.timedelta(minutes=110),
         "region": numpy.string_('Tampa_Bay'),
         "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
     }
@@ -153,8 +153,8 @@ def download_and_process(ofs_model, ofs_product, ofs_region, index_file_path, s1
     local_files = []
     for forecast in MODELS[ofs_model]["forecast_hours"]:
         forecast_str = "f{0:03d}".format(forecast)
-        url = cycletime.strftime("{}{}".format(HTTP_SERVER_COOPS, HTTP_NETCDF_PATH_FORMAT)).format(
-            model_str_uc=ofs_model.upper(), model_str_lc=ofs_model.lower(), forecast_str=forecast_str)
+        url = cycletime.strftime("{}{}".format(HTTP_SERVER_NOMADS, HTTP_NETCDF_PATH_FORMAT)).format(
+            model_str_uc=ofs_model.lower(), model_str_lc=ofs_model.lower(), forecast_str=forecast_str)
         local_file = "{}/{}".format(download_dir, cycletime.strftime(LOCAL_NETCDF_FILENAME_FORMAT).format(
             model_str_lc=ofs_model.lower(), forecast_str=forecast_str))
         print("Downloading {} to {}...".format(url, local_file))

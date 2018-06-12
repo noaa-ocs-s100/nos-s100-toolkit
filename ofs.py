@@ -47,7 +47,7 @@ MODELS = {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=110),
+        "file_delay": datetime.timedelta(minutes=85),
         "region": numpy.string_('Chesapeake_Bay'),
         "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
     },
@@ -55,7 +55,7 @@ MODELS = {
         # 3-hourly output from +3 to +72
         "forecast_hours": list(range(3, 73, 3)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=150),
+        "file_delay": datetime.timedelta(minutes=134),
         "region": numpy.string_('Gulf_of_Maine'),
         "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
     },
@@ -63,7 +63,7 @@ MODELS = {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=110),
+        "file_delay": datetime.timedelta(minutes=77),
         "region": numpy.string_('Delaware_Bay'),
         "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
     },
@@ -71,7 +71,7 @@ MODELS = {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=110),
+        "file_delay": datetime.timedelta(minutes=74),
         "region": numpy.string_('Tampa_Bay'),
         "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
     }
@@ -116,7 +116,7 @@ def get_latest_cycletime(ofs_model):
     return cycletime
 
 
-def download_and_process(ofs_model, ofs_product, ofs_region, index_file_path, s111_dir, cycletime, download_dir):
+def download_and_process(ofs_model, ofs_product, ofs_region, index_file_path, s111_dir, cycletime, download_dir, target_depth):
     """Download latest model run and convert to S-111 format.
 
     Creates a list of paths to NetCDF files downloaded successfully, corresponding
@@ -136,6 +136,9 @@ def download_and_process(ofs_model, ofs_product, ofs_region, index_file_path, s1
             subdirectory named according to the model identifier (will be
             created if it does not yet exist; if it does exist, existing files
             will be removed before downloading new files).
+        target_depth: The water current at a specified target depth below
+            the sea surface in meters, default target depth is 4.5 meters,
+            target interpolation depth must be greater or equal to 0.
     """
     if not download_dir.endswith("/"):
         download_dir += "/"
@@ -164,7 +167,7 @@ def download_and_process(ofs_model, ofs_product, ofs_region, index_file_path, s1
         local_files.append(local_file)
 
     print("Converting files to S111 format...")
-    s111.roms_to_s111(index_file_path, local_files, s111_dir, cycletime, ofs_model, ofs_product, ofs_region)
+    s111.roms_to_s111(index_file_path, local_files, s111_dir, cycletime, ofs_model, ofs_product, ofs_region, target_depth)
     print("Conversion complete.")
 
 
@@ -180,7 +183,8 @@ def main():
     parser.add_argument("-d", "--download_dir", help="Path to a directory where downloaded model output files can be placed. Files will be downloaded into a subdirectory named to match the model identifier (e.g. 'cbofs') (if it does not yet exist, it will be created). Prior to downloading, any existing NetCDF files in the model's subdirectory will be deleted to prevent file accumulation. Required when -m/--model_file_path is not specified.")
     parser.add_argument("-o", "--ofs_model", help="Identifier of target Operational Forecast System (OFS) to be processed (e.g. cbofs, dbofs, gomofs, or tbofs)", required=True)
     parser.add_argument("-c", "--cycletime", help="Model cycle time (i.e. initialization/reference time) to process, in the format YYYYMMDDHH. If not specified, the most recent cycle will be calculated using configured thresholds and present system time.")
-    parser.add_argument("-t", "--target_cellsize_meters", help=" Target cellsize of regular grid cells in meters. Actual size of x/y grid cells will vary slightly, since the regular grid uses lat/lon coordinates (thus a cell's width/height in meters will vary by latitude), and since it will be adjusted in order to fit a whole number of grid cells in the x and y directions within the calculated grid extent.")
+    parser.add_argument("-t", "--target_cellsize_meters", help="Target cellsize of regular grid cells in meters. Actual size of x/y grid cells will vary slightly, since the regular grid uses lat/lon coordinates (thus a cell's width/height in meters will vary by latitude), and since it will be adjusted in order to fit a whole number of grid cells in the x and y directions within the calculated grid extent.")
+    parser.add_argument("-z", "--target_depth", help="The water current at a specified target depth below the sea surface in meters, default target depth is 4.5 meters. Target interpolation depth must be greater or equal to 0.")
     args = parser.parse_args()
 
     ofs_model = args.ofs_model
@@ -189,16 +193,18 @@ def main():
         return 1
     ofs_model = ofs_model.lower()
 
-    if not args.s111_dir and not args.build_index:
-        parser.error("Either --s111_dir or --build_index must be specified.")
-        print(args)
-        return 1
+    target_depth = args.target_depth
+    if target_depth is not None:
+        target_depth = float(target_depth)
+        if target_depth < 0:
+            parser.error("Invalid entry, depth must be positive")
+            return 1
 
     cycletime = args.cycletime
     if cycletime is not None:
         try:
             cycletime = datetime.datetime.strptime(cycletime, "%Y%m%d%H")
-        except ValueError as e:
+        except ValueError:
             parser.error("Invalid -c/--cycletime specified [{}]. Format must be YYYYMMDD.".format(args.cycletime))
             return 1
     else:
@@ -246,12 +252,12 @@ def main():
         if not os.path.isdir(s111_dir):
             os.makedirs(s111_dir)
         if args.model_file_path is not None:
-            s111.roms_to_s111(args.index_file_path, args.model_file_path, s111_dir, cycletime, ofs_model, ofs_product, ofs_region)
+            s111.roms_to_s111(args.index_file_path, args.model_file_path, s111_dir, cycletime, ofs_model, ofs_product, ofs_region, target_depth)
         else:
             if not args.download_dir or not os.path.isdir(args.download_dir):
                 parser.error("Invalid/missing download directory (-d/--download_dir) specified.")
                 return 1
-            download_and_process(ofs_model, ofs_product, ofs_region, args.index_file_path, s111_dir, cycletime, args.download_dir)
+            download_and_process(ofs_model, ofs_product, ofs_region, args.index_file_path, s111_dir, cycletime, args.download_dir, target_depth)
     return 0
 
 

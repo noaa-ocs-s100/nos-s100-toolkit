@@ -116,30 +116,12 @@ def get_latest_cycletime(ofs_model):
     return cycletime
 
 
-def download_and_process(ofs_model, ofs_product, ofs_region, index_file_path, s111_dir, cycletime, download_dir, target_depth):
-    """Download latest model run and convert to S-111 format.
-
-    Creates a list of paths to NetCDF files downloaded successfully, corresponding
-    with the order specified in `forecasts`.
+def download(ofs_model, cycletime, download_dir):
+    """Download model files
 
     Args:
-        ofs_model: The target model identifier.
-        ofs_region: Geographic identifier metadata.
-        ofs_product: Model description and type of forecast metadata.
-        index_file_path: Path to NetCDF index file required for interpolation.
-        s111_dir: Path to a parent directory where output S111 HDF5 file(s)
-            will be generated. Must exist.
-        cycletime: `datetime.datetime` representing model initialization
-            (reference/cycle) time.
-        download_dir: Path to a parent directory where model output files will
-            be downloaded. Must exist. Files will be downloaded to a
-            subdirectory named according to the model identifier (will be
-            created if it does not yet exist; if it does exist, existing files
-            will be removed before downloading new files).
-        target_depth: The water current at a specified target depth below
-            the sea surface in meters, default target depth is 4.5 meters,
-            target interpolation depth must be greater or equal to 0.
-    """
+
+        """
     if not download_dir.endswith("/"):
         download_dir += "/"
     download_dir += ofs_model.lower()
@@ -166,8 +148,36 @@ def download_and_process(ofs_model, ofs_product, ofs_region, index_file_path, s1
         print("Download successful.")
         local_files.append(local_file)
 
+    return local_files
+
+
+def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs_model, MODELS, target_depth):
+    """Download latest model run and convert to S-111 format.
+
+    Creates a list of paths to NetCDF files downloaded successfully, corresponding
+    with the order specified in `forecasts`.
+
+    Args:
+        ofs_model: The target model identifier.
+        MODELS[ofs_model]: OFS specific metadata.
+        index_file_path: Path to NetCDF index file required for interpolation.
+        s111_dir: Path to a parent directory where output S111 HDF5 file(s)
+            will be generated. Must exist.
+        cycletime: `datetime.datetime` representing model initialization
+            (reference/cycle) time.
+        download_dir: Path to a parent directory where model output files will
+            be downloaded. Must exist. Files will be downloaded to a
+            subdirectory named according to the model identifier (will be
+            created if it does not yet exist; if it does exist, existing files
+            will be removed before downloading new files).
+        target_depth: The water current at a specified target depth below
+            the sea surface in meters, default target depth is 4.5 meters,
+            target interpolation depth must be greater or equal to 0.
+    """
+    local_files = download(ofs_model, cycletime, download_dir)
+
     print("Converting files to S111 format...")
-    s111.roms_to_s111(index_file_path, local_files, s111_dir, cycletime, ofs_model, ofs_product, ofs_region, target_depth)
+    s111.roms_to_s111(index_file_path, local_files, s111_dir, cycletime, ofs_model, MODELS, target_depth)
     print("Conversion complete.")
 
 
@@ -240,8 +250,6 @@ def main():
         parser.error("Invalid/missing S-111 output directory (-s/-s111_dir) specified.")
         return 1
     else:
-        ofs_region = MODELS[ofs_model]["region"]
-        ofs_product = MODELS[ofs_model]["current_product_method"]
         if not os.path.exists(args.index_file_path):
             parser.error("Specified index file does not exist [{}]".format(args.index_file_path))
             return 1
@@ -252,12 +260,12 @@ def main():
         if not os.path.isdir(s111_dir):
             os.makedirs(s111_dir)
         if args.model_file_path is not None:
-            s111.roms_to_s111(args.index_file_path, args.model_file_path, s111_dir, cycletime, ofs_model, ofs_product, ofs_region, target_depth)
+            s111.roms_to_s111(args.index_file_path, args.model_file_path, s111_dir, cycletime, ofs_model, MODELS, target_depth)
         else:
             if not args.download_dir or not os.path.isdir(args.download_dir):
                 parser.error("Invalid/missing download directory (-d/--download_dir) specified.")
                 return 1
-            download_and_process(ofs_model, ofs_product, ofs_region, args.index_file_path, s111_dir, cycletime, args.download_dir, target_depth)
+            download_and_process(args.index_file_path, args.download_dir, s111_dir, cycletime, ofs_model, MODELS, target_depth)
     return 0
 
 

@@ -48,32 +48,28 @@ MODELS = {
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=85),
-        "region": numpy.string_('Chesapeake_Bay'),
-        "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
+        "ofs_metadata": s111.S111Metadata('Chesapeake_Bay', 'ROMS_Hydrodynamic_Model_Forecasts')
     },
     "gomofs": {
         # 3-hourly output from +3 to +72
         "forecast_hours": list(range(3, 73, 3)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=134),
-        "region": numpy.string_('Gulf_of_Maine'),
-        "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
+        "ofs_metadata": s111.S111Metadata('Gulf_of_Maine', 'ROMS_Hydrodynamic_Model_Forecasts')
     },
     "dbofs": {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=77),
-        "region": numpy.string_('Delaware_Bay'),
-        "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
+        "ofs_metadata": s111.S111Metadata('Delaware_Bay', 'ROMS_Hydrodynamic_Model_Forecasts')
     },
     "tbofs": {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=74),
-        "region": numpy.string_('Tampa_Bay'),
-        "current_product_method": numpy.string_('ROMS_Hydrodynamic_Model_Forecasts')
+        "ofs_metadata": s111.S111Metadata('Tampa_Bay', 'ROMS_Hydrodynamic_Model_Forecasts')
     }
 }
 
@@ -151,15 +147,13 @@ def download(ofs_model, cycletime, download_dir):
     return local_files
 
 
-def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs_model, MODELS, target_depth):
+def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth):
     """Download latest model run and convert to S-111 format.
 
     Creates a list of paths to NetCDF files downloaded successfully, corresponding
     with the order specified in `forecasts`.
 
     Args:
-        ofs_model: The target model identifier.
-        MODELS[ofs_model]: OFS specific metadata.
         index_file_path: Path to NetCDF index file required for interpolation.
         s111_dir: Path to a parent directory where output S111 HDF5 file(s)
             will be generated. Must exist.
@@ -170,6 +164,10 @@ def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs
             subdirectory named according to the model identifier (will be
             created if it does not yet exist; if it does exist, existing files
             will be removed before downloading new files).
+        ofs_model: The target model identifier.
+        ofs_metadata: `S111Metadata` instance describing metadata for geographic
+            identifier and description of current meter type, forecast method,
+            or model.
         target_depth: The water current at a specified target depth below
             the sea surface in meters, default target depth is 4.5 meters,
             target interpolation depth must be greater or equal to 0.
@@ -177,7 +175,7 @@ def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs
     local_files = download(ofs_model, cycletime, download_dir)
 
     print("Converting files to S111 format...")
-    s111.roms_to_s111(index_file_path, local_files, s111_dir, cycletime, ofs_model, MODELS, target_depth)
+    s111.roms_to_s111(index_file_path, local_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
     print("Conversion complete.")
 
 
@@ -260,12 +258,12 @@ def main():
         if not os.path.isdir(s111_dir):
             os.makedirs(s111_dir)
         if args.model_file_path is not None:
-            s111.roms_to_s111(args.index_file_path, args.model_file_path, s111_dir, cycletime, ofs_model, MODELS, target_depth)
+            s111.roms_to_s111(args.index_file_path, args.model_file_path, s111_dir, cycletime, ofs_model, MODELS[ofs_model]["ofs_metadata"], target_depth)
         else:
             if not args.download_dir or not os.path.isdir(args.download_dir):
                 parser.error("Invalid/missing download directory (-d/--download_dir) specified.")
                 return 1
-            download_and_process(args.index_file_path, args.download_dir, s111_dir, cycletime, ofs_model, MODELS, target_depth)
+            download_and_process(args.index_file_path, args.download_dir, s111_dir, cycletime, ofs_model, MODELS[ofs_model]["ofs_metadata"], target_depth)
     return 0
 
 

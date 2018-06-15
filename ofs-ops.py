@@ -13,7 +13,7 @@ from s100ofs import s111
 MAXWORKERS = 2
 
 SOURCE_PATH = "/opt/s100/"
-DEST_PATH = "/win/ofsdata/{forecast_date}/HDF5/S111_1.0.0/"
+DEST_PATH = "/win/ofsdata/%Y%m%d/HDF5/S111_1.0.0/"
 OFS_MODEL = "cbofs"
 
 
@@ -44,10 +44,10 @@ def run_cbofs():
     # Copy s111 files to OCS FTP /win/ofsdata/{forecast_date}/HDF5/S111_1.0.0
     for s111_file_path in s111_file_paths:
         split_path = os.path.split(s111_file_path)
-        file_date = split_path[1][7:15]
-        shutil.copy(s111_file_path, DEST_PATH.format(forecast_date=file_date))
+        dst = os.path.join(cycletime.strftime(DEST_PATH), split_path[1])
+        shutil.copyfile(s111_file_path, dst)
 
-    # Remove s111 files from hdf5 directory
+        # Remove s111 files from hdf5 directory
     delete_files = glob("{}/*.h5".format(s111_dir))
     for delete_files in delete_files:
         os.remove(delete_files)

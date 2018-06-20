@@ -7,7 +7,6 @@ import urllib.request
 import os
 from glob import glob
 import sys
-import numpy
 
 from s100ofs.model import roms
 from s100ofs import s111
@@ -113,10 +112,17 @@ def get_latest_cycletime(ofs_model):
 
 
 def download(ofs_model, cycletime, download_dir):
-    """Download model files
+    """Download latest model run
 
     Args:
-
+        ofs_model: The target model identifier.
+        cycletime: `datetime.datetime` representing model initialization
+            (reference/cycle) time.
+        download_dir: Path to a parent directory where model output files will
+            be downloaded. Must exist. Files will be downloaded to a
+            subdirectory named according to the model identifier (will be
+            created if it does not yet exist; if it does exist, existing files
+            will be removed before downloading new files).
         """
     if not download_dir.endswith("/"):
         download_dir += "/"

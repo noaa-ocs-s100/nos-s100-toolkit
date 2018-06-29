@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-""" Execute S100OFS Operationally"""
+"""
+Download and convert OFS output to S-111 format using an operational configuration.
+The latest OFS output model run is downloaded from the FTP server, then is converted
+to both default-grid and subset-grid S-111 files in parallel.  The resulting S-111
+files are then moved to an operational storage volume for FTP dissemination.
+"""
 
 from multiprocessing import Pool
 import shutil

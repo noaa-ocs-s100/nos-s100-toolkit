@@ -192,6 +192,7 @@ def main():
     parser.add_argument("-s", "--s111_dir", help="Path to a directory where generated S-111 HDF5 file(s) will be generated. Generated files will be placed in a subdirectory named to match the model identifier (e.g. 'cbofs') and files will be auto-named using identifying information (e.g. model reference/cycle time, subgrid id) and with the .h5 file extension. Ignored if -b/--build_index is specified.")
     parser.add_argument("-b", "--build_index", action="store_true", help="Build a new index NetCDF file at the path specified by -i/--index_file_path. This file must be generated before processing any model output, as it will contain the regular grid definition and interpolation parameters. Once created, it can be used indefinitely for the target model unless changes to the regular grid extent/resolution are required or if the underlying model grid changes.")
     parser.add_argument("-g", "--grid_shp", help="Path to a polygon grid shapefile that will be used to generate matching subgrids when generating an index file. Only used when -b/--build_index is specified. If not specified, the model extent will be used to generate the index file and no subsetting will occur. Ignored if -b/--build_index is not specified.")
+    parser.add_argument("-f", "--grid_field_name", help="Specify a field name from the input grid shapefile to collect")
     parser.add_argument("-l", "--land_shp", help="Path to a land/shoreline polygon shapefile that will be used to apply a detailed land mask when generating an index file. Only used when -b/--build_index is specified. If not specified, the grid mask will be determined by the model's own mask, which may be less detailed. Ignored if -b/--build_index is not specified.")
     parser.add_argument("-m", "--model_file_path", nargs="+", help="Path to one or more NetCDF files containing raw/native model output to be converted to S111 format (when -s/--s111_dir is specified) or used to build an index file (when -b/--build_index is specified). If not specified, the latest model run will be automatically downloaded and processed. Required when --build_index is specified.", required=False)
     parser.add_argument("-d", "--download_dir", help="Path to a directory where downloaded model output files can be placed. Files will be downloaded into a subdirectory named to match the model identifier (e.g. 'cbofs') (if it does not yet exist, it will be created). Prior to downloading, any existing NetCDF files in the model's subdirectory will be deleted to prevent file accumulation. Required when -m/--model_file_path is not specified.")
@@ -248,7 +249,7 @@ def main():
         with roms.ROMSIndexFile(args.index_file_path) as index_file, \
                 roms.ROMSOutputFile(args.model_file_path[0]) as model_output_file:
             index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model,
-                               shoreline_shp=args.land_shp, subset_grid_shp=args.grid_shp)
+                               shoreline_shp=args.land_shp, subset_grid_shp=args.grid_shp, subset_grid_field_name=args.grid_field_name)
 
     elif not os.path.isdir(args.s111_dir):
         parser.error("Invalid/missing S-111 output directory (-s/-s111_dir) specified.")

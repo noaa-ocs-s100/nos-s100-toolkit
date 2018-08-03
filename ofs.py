@@ -8,8 +8,8 @@ import os
 from glob import glob
 import sys
 
-from s100ofs.model import roms
-from s100ofs import s111
+from s100.model import roms
+from s100 import s111
 
 # Base URL of NCEP NOMADS HTTP for accessing CO-OPS OFS NetCDF files
 HTTP_SERVER_NOMADS = "http://nomads.ncep.noaa.gov"
@@ -179,9 +179,15 @@ def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs
             target interpolation depth must be greater or equal to 0.
     """
     local_files = download(ofs_model, cycletime, download_dir)
+    print (download_dir)
 
     print("Converting files to S111 format...")
-    s111.roms_to_s111(index_file_path, local_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
+
+    index_file = roms.ROMSIndexFile(index_file_path)
+    model_output_files = []
+    for local_file in local_files:
+        model_output_files.append(roms.ROMSOutputFile(local_file))
+    s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
     print("Conversion complete.")
 
 
@@ -246,10 +252,16 @@ def main():
             parser.error("Specified land/shoreline shapefile does not exist [{}]".format(args.land_shp))
             return 1
 
-        with roms.ROMSIndexFile(args.index_file_path) as index_file, \
-                roms.ROMSOutputFile(args.model_file_path[0]) as model_output_file:
+        index_file = roms.ROMSIndexFile(args.index_file_path)
+        model_output_file = roms.ROMSOutputFile(args.model_file_path[0])
+        try:
+            index_file.open()
+            model_output_file.open()
             index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model,
                                shoreline_shp=args.land_shp, subset_grid_shp=args.grid_shp, subset_grid_field_name=args.grid_field_name)
+        finally:
+            index_file.close()
+            model_output_file.close()
 
     elif not os.path.isdir(args.s111_dir):
         parser.error("Invalid/missing S-111 output directory (-s/-s111_dir) specified.")
@@ -265,7 +277,9 @@ def main():
         if not os.path.isdir(s111_dir):
             os.makedirs(s111_dir)
         if args.model_file_path is not None:
-            s111.roms_to_s111(args.index_file_path, args.model_file_path, s111_dir, cycletime, ofs_model, MODELS[ofs_model]["ofs_metadata"], target_depth)
+            index_file = roms.ROMSIndexFile(args.index_file_path)
+            model_output_file = roms.ROMSOutputFile(args.model_file_path[0])
+            s111.convert_to_s111(index_file, [model_output_file], s111_dir, cycletime, ofs_model, MODELS[ofs_model]["ofs_metadata"], target_depth)
         else:
             if not args.download_dir or not os.path.isdir(args.download_dir):
                 parser.error("Invalid/missing download directory (-d/--download_dir) specified.")

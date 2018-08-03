@@ -13,7 +13,7 @@ from glob import glob
 import argparse
 
 import ofs
-from s100ofs import s111
+from s100 import s111
 
 # Max number of subprocess workers to spin up
 MAXWORKERS = 2

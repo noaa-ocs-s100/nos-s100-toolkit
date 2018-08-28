@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Download and convert ROMS OFS NetCDF output to S-111 compliant HDF5."""
+"""Download and convert OFS NetCDF model output to S-111 compliant HDF5."""
 import argparse
 import datetime
 import shutil
@@ -9,6 +9,7 @@ from glob import glob
 import sys
 
 from s100.model import roms
+from s100.model import fvcom
 from s100 import s111
 
 # Base URL of NCEP NOMADS HTTP for accessing CO-OPS OFS NetCDF files
@@ -47,28 +48,72 @@ MODELS = {
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=85),
-        "ofs_metadata": s111.S111Metadata('Chesapeake_Bay', 'ROMS_Hydrodynamic_Model_Forecasts')
+        "ofs_metadata": s111.S111Metadata('Chesapeake_Bay', 'ROMS_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'roms'
     },
     "gomofs": {
         # 3-hourly output from +3 to +72
         "forecast_hours": list(range(3, 73, 3)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=134),
-        "ofs_metadata": s111.S111Metadata('Gulf_of_Maine', 'ROMS_Hydrodynamic_Model_Forecasts')
+        "ofs_metadata": s111.S111Metadata('Gulf_of_Maine', 'ROMS_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'roms'
     },
     "dbofs": {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=80),
-        "ofs_metadata": s111.S111Metadata('Delaware_Bay', 'ROMS_Hydrodynamic_Model_Forecasts')
+        "ofs_metadata": s111.S111Metadata('Delaware_Bay', 'ROMS_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'roms'
     },
     "tbofs": {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=74),
-        "ofs_metadata": s111.S111Metadata('Tampa_Bay', 'ROMS_Hydrodynamic_Model_Forecasts')
+        "ofs_metadata": s111.S111Metadata('Tampa_Bay', 'ROMS_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'roms'
+    },
+    "negofs": {
+        # Hourly output from +1 to +48
+        "forecast_hours": list(range(1, 49)),
+        "cycles": (3, 9, 15, 21),
+        "file_delay": datetime.timedelta(minutes=95),
+        "ofs_metadata": s111.S111Metadata('Northeast_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'fvcom'
+    },
+    "nwgofs": {
+        # Hourly output from +1 to +48
+        "forecast_hours": list(range(1, 49)),
+        "cycles": (3, 9, 15, 21),
+        "file_delay": datetime.timedelta(minutes=90),
+        "ofs_metadata": s111.S111Metadata('Northwest_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'fvcom'
+    },
+    "ngofs": {
+        # Hourly output from +1 to +48
+        "forecast_hours": list(range(1, 49)),
+        "cycles": (3, 9, 15, 21),
+        "file_delay": datetime.timedelta(minutes=50),
+        "ofs_metadata": s111.S111Metadata('Northern_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'fvcom'
+    },
+    "sfbofs": {
+        # Hourly output from +1 to +48
+        "forecast_hours": list(range(1, 49)),
+        "cycles": (3, 9, 15, 21),
+        "file_delay": datetime.timedelta(minutes=55),
+        "ofs_metadata": s111.S111Metadata('San_Francisco_Bay', 'FVCOM_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'fvcom'
+    },
+    "leofs": {
+        # Hourly output from +1 to +48
+        "forecast_hours": list(range(1, 49)),
+        "cycles": (0, 6, 12, 18),
+        "file_delay": datetime.timedelta(minutes=100),
+        "ofs_metadata": s111.S111Metadata('Lake_Erie', 'FVCOM_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'fvcom'
     }
 }
 
@@ -127,6 +172,7 @@ def download(ofs_model, cycletime, download_dir):
     if not download_dir.endswith("/"):
         download_dir += "/"
     download_dir += ofs_model.lower()
+
     if not os.path.isdir(download_dir):
         os.makedirs(download_dir)
     else:
@@ -183,11 +229,20 @@ def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs
 
     print("Converting files to S111 format...")
 
-    index_file = roms.ROMSIndexFile(index_file_path)
-    model_output_files = []
-    for local_file in local_files:
-        model_output_files.append(roms.ROMSOutputFile(local_file))
-    s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
+    if MODELS[ofs_model]["model_type"] == "fvcom":
+        index_file = fvcom.FVCOMIndexFile(index_file_path)
+        model_output_files = []
+        for local_file in local_files:
+            model_output_files.append(fvcom.FVCOMFile(local_file))
+        s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
+
+    elif MODELS[ofs_model]["model_type"] == "roms":
+        index_file = roms.ROMSIndexFile(index_file_path)
+        model_output_files = []
+        for local_file in local_files:
+            model_output_files.append(roms.ROMSFile(local_file))
+        s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
+
     print("Conversion complete.")
 
 
@@ -252,8 +307,13 @@ def main():
             parser.error("Specified land/shoreline shapefile does not exist [{}]".format(args.land_shp))
             return 1
 
-        index_file = roms.ROMSIndexFile(args.index_file_path)
-        model_output_file = roms.ROMSOutputFile(args.model_file_path[0])
+        if MODELS[ofs_model]["model_type"] == "fvcom":
+            index_file = fvcom.FVCOMIndexFile(args.index_file_path)
+            model_output_file = fvcom.FVCOMFile(args.model_file_path[0])
+        elif MODELS[ofs_model]["model_type"] == "roms":
+            index_file = roms.ROMSIndexFile(args.index_file_path)
+            model_output_file = roms.ROMSFile(args.model_file_path[0])
+
         try:
             index_file.open()
             model_output_file.open()
@@ -276,15 +336,24 @@ def main():
         s111_dir += ofs_model.lower()
         if not os.path.isdir(s111_dir):
             os.makedirs(s111_dir)
+
         if args.model_file_path is not None:
-            index_file = roms.ROMSIndexFile(args.index_file_path)
-            model_output_file = roms.ROMSOutputFile(args.model_file_path[0])
+            if MODELS[ofs_model]["model_type"] == "fvcom":
+                index_file = fvcom.FVCOMIndexFile(args.index_file_path)
+                model_output_file = fvcom.FVCOMFile(args.model_file_path[0])
+            elif MODELS[ofs_model]["model_type"] == "roms":
+                index_file = roms.ROMSIndexFile(args.index_file_path)
+                model_output_file = roms.ROMSFile(args.model_file_path[0])
+
             s111.convert_to_s111(index_file, [model_output_file], s111_dir, cycletime, ofs_model, MODELS[ofs_model]["ofs_metadata"], target_depth)
+
         else:
             if not args.download_dir or not os.path.isdir(args.download_dir):
                 parser.error("Invalid/missing download directory (-d/--download_dir) specified.")
                 return 1
+
             download_and_process(args.index_file_path, args.download_dir, s111_dir, cycletime, ofs_model, MODELS[ofs_model]["ofs_metadata"], target_depth)
+
     return 0
 
 

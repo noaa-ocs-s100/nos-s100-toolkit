@@ -60,7 +60,7 @@ MODELS = {
         # Hourly output from +1 to +48
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
-        "file_delay": datetime.timedelta(minutes=77),
+        "file_delay": datetime.timedelta(minutes=80),
         "ofs_metadata": s111.S111Metadata('Delaware_Bay', 'ROMS_Hydrodynamic_Model_Forecasts')
     },
     "tbofs": {

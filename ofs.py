@@ -243,8 +243,6 @@ def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs
             model_output_files.append(roms.ROMSFile(local_file))
         s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
 
-    print("Conversion complete.")
-
 
 def main():
     """Parse command line arguments and execute target functions."""

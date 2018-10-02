@@ -35,12 +35,8 @@ and value is another dictionary with the following properties:
         1200, and 1800 UTC, specify (0,6,12,18).
     file_delay: `datetime.timedelta` representing delay (time since model cycle
         time) of file availability on HTTP server.
-    target_cellsize_meters: Target size of regular grid cells, in meters.
-        Actual size of x/y grid cells will vary slightly, since the regular
-        grid uses lat/lon coordinates (thus a cell's width/height in meters
-        will vary by latitude), and since it will be adjusted in order to fit a
-        whole number of grid cells in the x and y directions within the
-        calculated grid extent.
+    ofs_metadata: OFS Region and Product
+    model_type: Type of underlining modelling framework.
 """
 MODELS = {
     "cbofs": {
@@ -316,7 +312,8 @@ def main():
             index_file.open()
             model_output_file.open()
             index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model,
-                               shoreline_shp=args.land_shp, subset_grid_shp=args.grid_shp, subset_grid_field_name=args.grid_field_name)
+                               MODELS[ofs_model]["model_type"], shoreline_shp=args.land_shp,
+                               subset_grid_shp=args.grid_shp, subset_grid_field_name=args.grid_field_name)
         finally:
             index_file.close()
             model_output_file.close()

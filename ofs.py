@@ -25,10 +25,12 @@ HTTP_SERVER_THREDDS = "https://opendap.co-ops.nos.noaa.gov"
 # reftime.strftime(HTTP_NETCDF_PATH_FORMAT).format(forecast_str='f012')
 HTTP_NETCDF_NOMADS_PATH_FORMAT = "/pub/data/nccf/com/nos/prod/{model_str_lc}.%Y%m%d/nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
 HTTP_NETCDF_THREDDS_PATH_FORMAT = "/thredds/fileServer/NOAA/{model_str_uc}/MODELS/%Y%m/nos.{model_str_lc}.fields.forecast.%Y%m%d.t%Hz.nc"
+HTTP_NETCDF_THREDDS_GLOFS_PATH_FORMAT = "/thredds/fileServer/NOAA/{model_str_uc}/MODELS/%Y%m/glofs.{model_str_lc}.fields.forecast.%Y%m%d.t%Hz.nc"
 
 # Folder path of downloaded NetCDF files.
 LOCAL_NETCDF_NOMADS_FILENAME_FORMAT = "nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
 LOCAL_NETCDF_THREDDS_FILENAME_FORMAT = "nos.{model_str_lc}.fields.%Y%m%d.t%Hz.nc"
+LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT = "glofs.{model_str_lc}.fields.%Y%m%d.t%Hz.nc"
 
 """
 Model configuration dictionary, where key is the lower-case model identifier
@@ -46,38 +48,57 @@ and value is another dictionary with the following properties:
 MODELS = {
     "cbofs": {
         # Hourly output from +1 to +48
+        "file_server": HTTP_SERVER_NOMADS,
+        "file_path": HTTP_NETCDF_NOMADS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=85),
         "ofs_metadata": s111.S111Metadata('Chesapeake_Bay', 'ROMS_Hydrodynamic_Model_Forecasts'),
         "model_type": 'roms'
+
     },
     "gomofs": {
         # 3-hourly output from +3 to +72
+        "file_server": HTTP_SERVER_NOMADS,
+        "file_path": HTTP_NETCDF_NOMADS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         "forecast_hours": list(range(3, 73, 3)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=134),
         "ofs_metadata": s111.S111Metadata('Gulf_of_Maine', 'ROMS_Hydrodynamic_Model_Forecasts'),
         "model_type": 'roms'
+
     },
     "dbofs": {
         # Hourly output from +1 to +48
+        "file_server": HTTP_SERVER_NOMADS,
+        "file_path": HTTP_NETCDF_NOMADS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=80),
         "ofs_metadata": s111.S111Metadata('Delaware_Bay', 'ROMS_Hydrodynamic_Model_Forecasts'),
         "model_type": 'roms'
+
     },
     "tbofs": {
         # Hourly output from +1 to +48
+        "file_server": HTTP_SERVER_NOMADS,
+        "file_path": HTTP_NETCDF_NOMADS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=74),
         "ofs_metadata": s111.S111Metadata('Tampa_Bay', 'ROMS_Hydrodynamic_Model_Forecasts'),
         "model_type": 'roms'
+
     },
     "negofs": {
         # Hourly output from +1 to +48
+        "file_server": HTTP_SERVER_NOMADS,
+        "file_path": HTTP_NETCDF_NOMADS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         "forecast_hours": list(range(1, 49)),
         "cycles": (3, 9, 15, 21),
         "file_delay": datetime.timedelta(minutes=95),
@@ -86,6 +107,9 @@ MODELS = {
     },
     "nwgofs": {
         # Hourly output from +1 to +48
+        "file_server": HTTP_SERVER_NOMADS,
+        "file_path": HTTP_NETCDF_NOMADS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         "forecast_hours": list(range(1, 49)),
         "cycles": (3, 9, 15, 21),
         "file_delay": datetime.timedelta(minutes=90),
@@ -94,6 +118,9 @@ MODELS = {
     },
     "ngofs": {
         # Hourly output from +1 to +48
+        "file_server": HTTP_SERVER_NOMADS,
+        "file_path": HTTP_NETCDF_NOMADS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         "forecast_hours": list(range(1, 49)),
         "cycles": (3, 9, 15, 21),
         "file_delay": datetime.timedelta(minutes=50),
@@ -102,6 +129,9 @@ MODELS = {
     },
     "sfbofs": {
         # Hourly output from +1 to +48
+        "file_server": HTTP_SERVER_NOMADS,
+        "file_path": HTTP_NETCDF_NOMADS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         "forecast_hours": list(range(1, 49)),
         "cycles": (3, 9, 15, 21),
         "file_delay": datetime.timedelta(minutes=55),
@@ -110,6 +140,9 @@ MODELS = {
     },
     "leofs": {
         # Hourly output from +1 to +48
+        "file_server": HTTP_SERVER_NOMADS,
+        "file_path": HTTP_NETCDF_NOMADS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         "forecast_hours": list(range(1, 49)),
         "cycles": (0, 6, 12, 18),
         "file_delay": datetime.timedelta(minutes=100),
@@ -118,6 +151,9 @@ MODELS = {
     },
     "nyofs": {
         # Hourly output from +1 to +53
+        "file_server": HTTP_SERVER_THREDDS,
+        "file_path": HTTP_NETCDF_THREDDS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
         "forecast_hours": list(range(0, 53)),
         "cycles": (5, 11, 17, 23),
         "file_delay": datetime.timedelta(minutes=100),
@@ -126,10 +162,57 @@ MODELS = {
     },
     "nyofs_fg": {
         # Hourly output from +1 to +53
+        "file_server": HTTP_SERVER_THREDDS,
+        "file_path": HTTP_NETCDF_THREDDS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
         "forecast_hours": list(range(0, 53)),
         "cycles": (5, 11, 17, 23),
         "file_delay": datetime.timedelta(minutes=100),
         "ofs_metadata": s111.S111Metadata('Port_of_New_York_and_New_Jersey', 'POM_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'pom'
+    },
+    "lmofs": {
+        # Hourly output from +1 to +59
+        "file_server": HTTP_SERVER_THREDDS,
+        "file_path": HTTP_NETCDF_THREDDS_GLOFS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT,
+        "forecast_hours": list(range(0, 59)),
+        "cycles": (0, 6, 12, 18),
+        "file_delay": datetime.timedelta(minutes=100),
+        "ofs_metadata": s111.S111Metadata('Lake_Michigan', 'POM_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'pom'
+    },
+    "lhofs": {
+        # Hourly output from +1 to +59
+        "file_server": HTTP_SERVER_THREDDS,
+        "file_path": HTTP_NETCDF_THREDDS_GLOFS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT,
+        "forecast_hours": list(range(0, 59)),
+        "cycles": (0, 6, 12, 18),
+        "file_delay": datetime.timedelta(minutes=100),
+        "ofs_metadata": s111.S111Metadata('Lake_Huron', 'POM_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'pom'
+    },
+    "loofs": {
+        # Hourly output from +1 to +59
+        "file_server": HTTP_SERVER_THREDDS,
+        "file_path": HTTP_NETCDF_THREDDS_GLOFS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT,
+        "forecast_hours": list(range(0, 59)),
+        "cycles": (0, 6, 12, 18),
+        "file_delay": datetime.timedelta(minutes=100),
+        "ofs_metadata": s111.S111Metadata('Lake_Ontario', 'POM_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'pom'
+    },
+    "lsofs": {
+        # Hourly output from +1 to +59
+        "file_server": HTTP_SERVER_THREDDS,
+        "file_path": HTTP_NETCDF_THREDDS_GLOFS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT,
+        "forecast_hours": list(range(0, 59)),
+        "cycles": (0, 6, 12, 18),
+        "file_delay": datetime.timedelta(minutes=100),
+        "ofs_metadata": s111.S111Metadata('Lake_Superior', 'POM_Hydrodynamic_Model_Forecasts'),
         "model_type": 'pom'
     }
 }
@@ -202,34 +285,30 @@ def download(ofs_model, cycletime, download_dir):
 
     local_files = []
 
-    if ofs_model == "nyofs":
-        url = cycletime.strftime("{}{}".format(HTTP_SERVER_THREDDS, HTTP_NETCDF_THREDDS_PATH_FORMAT)).format(model_str_uc=ofs_model.upper(), model_str_lc=ofs_model.lower())
-        local_file = "{}/{}".format(download_dir, cycletime.strftime(LOCAL_NETCDF_THREDDS_FILENAME_FORMAT).format(model_str_lc=ofs_model.lower()))
-        print("Downloading {} to {}...".format(url, local_file))
-        with urllib.request.urlopen(url) as response, open(local_file, "wb") as out_file:
-            shutil.copyfileobj(response, out_file)
-        print("Download successful.")
-        local_files.append(local_file)
-    elif ofs_model == "nyofs_fg":
-        url = cycletime.strftime("{}{}".format(HTTP_SERVER_THREDDS, HTTP_NETCDF_THREDDS_PATH_FORMAT)).format(model_str_uc="NYOFS", model_str_lc=ofs_model.lower())
-        local_file = "{}/{}".format(download_dir, cycletime.strftime(LOCAL_NETCDF_THREDDS_FILENAME_FORMAT).format(model_str_lc=ofs_model.lower()))
-        print("Downloading {} to {}...".format(url, local_file))
-        with urllib.request.urlopen(url) as response, open(local_file, "wb") as out_file:
-            shutil.copyfileobj(response, out_file)
-        print("Download successful.")
-        local_files.append(local_file)
-    else:
+    if MODELS[ofs_model]["file_server"] == HTTP_SERVER_NOMADS:
         for forecast in MODELS[ofs_model]["forecast_hours"]:
             forecast_str = "f{0:03d}".format(forecast)
-            url = cycletime.strftime("{}{}".format(HTTP_SERVER_NOMADS, HTTP_NETCDF_NOMADS_PATH_FORMAT)).format(
+            url = cycletime.strftime("{}{}".format(MODELS[ofs_model]["file_server"], MODELS[ofs_model]["file_path"])).format(
                 model_str_lc=ofs_model.lower(), forecast_str=forecast_str)
-            local_file = "{}/{}".format(download_dir, cycletime.strftime(LOCAL_NETCDF_NOMADS_FILENAME_FORMAT).format(
+            local_file = "{}/{}".format(download_dir, cycletime.strftime(MODELS[ofs_model]["file_name"]).format(
                 model_str_lc=ofs_model.lower(), forecast_str=forecast_str))
             print("Downloading {} to {}...".format(url, local_file))
             with urllib.request.urlopen(url) as response, open(local_file, "wb") as out_file:
                 shutil.copyfileobj(response, out_file)
             print("Download successful.")
             local_files.append(local_file)
+
+    elif MODELS[ofs_model]["file_server"] == HTTP_SERVER_THREDDS:
+        if ofs_model == "nyofs_fg":
+            url = cycletime.strftime("{}{}".format(MODELS[ofs_model]["file_server"], MODELS[ofs_model]["file_path"])).format(model_str_uc="NYOFS", model_str_lc=ofs_model.lower())
+        else:
+            url = cycletime.strftime("{}{}".format(MODELS[ofs_model]["file_server"], MODELS[ofs_model]["file_path"])).format(model_str_uc=ofs_model.upper(), model_str_lc=ofs_model.lower())
+        local_file = "{}/{}".format(download_dir, cycletime.strftime(MODELS[ofs_model]["file_name"]).format(model_str_lc=ofs_model.lower()))
+        print("Downloading {} to {}...".format(url, local_file))
+        with urllib.request.urlopen(url) as response, open(local_file, "wb") as out_file:
+            shutil.copyfileobj(response, out_file)
+        print("Download successful.")
+        local_files.append(local_file)
 
     return local_files
 

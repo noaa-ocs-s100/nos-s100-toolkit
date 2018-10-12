@@ -10,20 +10,25 @@ import sys
 
 from s100.model import roms
 from s100.model import fvcom
+from s100.model import pom
 from s100 import s111
 
 # Base URL of NCEP NOMADS HTTP for accessing CO-OPS OFS NetCDF files
 HTTP_SERVER_NOMADS = "http://nomads.ncep.noaa.gov"
+# Base URL of CO-OPS THREDDS HTTP for accessing CO-OPS OFS NetCDF files
+HTTP_SERVER_THREDDS = "https://opendap.co-ops.nos.noaa.gov"
 
 # Path format of NetCDF files. Forecast initialization (reference) time will be
 # injected using datetime.strftime() and zero-padded forecast designation (e.g.
 # 'f012') will be injected by using str.format().
 # Example:
-#    reftime.strftime(HTTP_NETCDF_PATH_FORMAT).format(forecast_str='f012')
-HTTP_NETCDF_PATH_FORMAT = "/pub/data/nccf/com/nos/prod/{model_str_uc}.%Y%m%d/nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
+# reftime.strftime(HTTP_NETCDF_PATH_FORMAT).format(forecast_str='f012')
+HTTP_NETCDF_NOMADS_PATH_FORMAT = "/pub/data/nccf/com/nos/prod/{model_str_lc}.%Y%m%d/nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
+HTTP_NETCDF_THREDDS_PATH_FORMAT = "/thredds/fileServer/NOAA/{model_str_uc}/MODELS/%Y%m/nos.{model_str_lc}.fields.forecast.%Y%m%d.t%Hz.nc"
 
 # Folder path of downloaded NetCDF files.
-LOCAL_NETCDF_FILENAME_FORMAT = "nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
+LOCAL_NETCDF_NOMADS_FILENAME_FORMAT = "nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
+LOCAL_NETCDF_THREDDS_FILENAME_FORMAT = "nos.{model_str_lc}.fields.%Y%m%d.t%Hz.nc"
 
 """
 Model configuration dictionary, where key is the lower-case model identifier
@@ -35,7 +40,7 @@ and value is another dictionary with the following properties:
         1200, and 1800 UTC, specify (0,6,12,18).
     file_delay: `datetime.timedelta` representing delay (time since model cycle
         time) of file availability on HTTP server.
-    ofs_metadata: OFS Region and Product
+    ofs_metadata: OFS region and product
     model_type: Type of underlining modelling framework.
 """
 MODELS = {
@@ -110,6 +115,22 @@ MODELS = {
         "file_delay": datetime.timedelta(minutes=100),
         "ofs_metadata": s111.S111Metadata('Lake_Erie', 'FVCOM_Hydrodynamic_Model_Forecasts'),
         "model_type": 'fvcom'
+    },
+    "nyofs": {
+        # Hourly output from +1 to +53
+        "forecast_hours": list(range(0, 53)),
+        "cycles": (5, 11, 17, 23),
+        "file_delay": datetime.timedelta(minutes=100),
+        "ofs_metadata": s111.S111Metadata('Port_of_New_York_and_New_Jersey', 'POM_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'pom'
+    },
+    "nyofs_fg": {
+        # Hourly output from +1 to +53
+        "forecast_hours": list(range(0, 53)),
+        "cycles": (5, 11, 17, 23),
+        "file_delay": datetime.timedelta(minutes=100),
+        "ofs_metadata": s111.S111Metadata('Port_of_New_York_and_New_Jersey', 'POM_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'pom'
     }
 }
 
@@ -180,17 +201,35 @@ def download(ofs_model, cycletime, download_dir):
             os.remove(delete_files)
 
     local_files = []
-    for forecast in MODELS[ofs_model]["forecast_hours"]:
-        forecast_str = "f{0:03d}".format(forecast)
-        url = cycletime.strftime("{}{}".format(HTTP_SERVER_NOMADS, HTTP_NETCDF_PATH_FORMAT)).format(
-            model_str_uc=ofs_model.lower(), model_str_lc=ofs_model.lower(), forecast_str=forecast_str)
-        local_file = "{}/{}".format(download_dir, cycletime.strftime(LOCAL_NETCDF_FILENAME_FORMAT).format(
-            model_str_lc=ofs_model.lower(), forecast_str=forecast_str))
+
+    if ofs_model == "nyofs":
+        url = cycletime.strftime("{}{}".format(HTTP_SERVER_THREDDS, HTTP_NETCDF_THREDDS_PATH_FORMAT)).format(model_str_uc=ofs_model.upper(), model_str_lc=ofs_model.lower())
+        local_file = "{}/{}".format(download_dir, cycletime.strftime(LOCAL_NETCDF_THREDDS_FILENAME_FORMAT).format(model_str_lc=ofs_model.lower()))
         print("Downloading {} to {}...".format(url, local_file))
         with urllib.request.urlopen(url) as response, open(local_file, "wb") as out_file:
             shutil.copyfileobj(response, out_file)
         print("Download successful.")
         local_files.append(local_file)
+    elif ofs_model == "nyofs_fg":
+        url = cycletime.strftime("{}{}".format(HTTP_SERVER_THREDDS, HTTP_NETCDF_THREDDS_PATH_FORMAT)).format(model_str_uc="NYOFS", model_str_lc=ofs_model.lower())
+        local_file = "{}/{}".format(download_dir, cycletime.strftime(LOCAL_NETCDF_THREDDS_FILENAME_FORMAT).format(model_str_lc=ofs_model.lower()))
+        print("Downloading {} to {}...".format(url, local_file))
+        with urllib.request.urlopen(url) as response, open(local_file, "wb") as out_file:
+            shutil.copyfileobj(response, out_file)
+        print("Download successful.")
+        local_files.append(local_file)
+    else:
+        for forecast in MODELS[ofs_model]["forecast_hours"]:
+            forecast_str = "f{0:03d}".format(forecast)
+            url = cycletime.strftime("{}{}".format(HTTP_SERVER_NOMADS, HTTP_NETCDF_NOMADS_PATH_FORMAT)).format(
+                model_str_lc=ofs_model.lower(), forecast_str=forecast_str)
+            local_file = "{}/{}".format(download_dir, cycletime.strftime(LOCAL_NETCDF_NOMADS_FILENAME_FORMAT).format(
+                model_str_lc=ofs_model.lower(), forecast_str=forecast_str))
+            print("Downloading {} to {}...".format(url, local_file))
+            with urllib.request.urlopen(url) as response, open(local_file, "wb") as out_file:
+                shutil.copyfileobj(response, out_file)
+            print("Download successful.")
+            local_files.append(local_file)
 
     return local_files
 
@@ -237,6 +276,13 @@ def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs
         model_output_files = []
         for local_file in local_files:
             model_output_files.append(roms.ROMSFile(local_file))
+        s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
+
+    elif MODELS[ofs_model]["model_type"] == "pom":
+        index_file = pom.POMIndexFile(index_file_path)
+        model_output_files = []
+        for local_file in local_files:
+            model_output_files.append(pom.POMFile(local_file))
         s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
 
 
@@ -307,6 +353,9 @@ def main():
         elif MODELS[ofs_model]["model_type"] == "roms":
             index_file = roms.ROMSIndexFile(args.index_file_path)
             model_output_file = roms.ROMSFile(args.model_file_path[0])
+        elif MODELS[ofs_model]["model_type"] == "pom":
+            index_file = pom.POMIndexFile(args.index_file_path)
+            model_output_file = pom.POMFile(args.model_file_path[0])
 
         try:
             index_file.open()
@@ -339,6 +388,9 @@ def main():
             elif MODELS[ofs_model]["model_type"] == "roms":
                 index_file = roms.ROMSIndexFile(args.index_file_path)
                 model_output_file = roms.ROMSFile(args.model_file_path[0])
+            elif MODELS[ofs_model]["model_type"] == "pom":
+                index_file = pom.POMIndexFile(args.index_file_path)
+                model_output_file = pom.POMFile(args.model_file_path[0])
 
             s111.convert_to_s111(index_file, [model_output_file], s111_dir, cycletime, ofs_model, MODELS[ofs_model]["ofs_metadata"], target_depth)
 

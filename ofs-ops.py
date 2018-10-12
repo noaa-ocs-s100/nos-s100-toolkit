@@ -49,10 +49,10 @@ def run_ofs(ofs_model):
     model_dir = "{}{}/".format(DEST_PATH, ofs_model.upper())
 
     # Call default grid processing
-    workers.append(workerPool.apply_async(s111.roms_to_s111, (index_default_path, local_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]["ofs_metadata"], None)))
+    workers.append(workerPool.apply_async(s111.convert_to_s111, (index_default_path, local_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]["ofs_metadata"], None)))
 
     # Call subgrid processing
-    workers.append(workerPool.apply_async(s111.roms_to_s111, (index_subset_path, local_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]["ofs_metadata"], None)))
+    workers.append(workerPool.apply_async(s111.convert_to_s111, (index_subset_path, local_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]["ofs_metadata"], None)))
 
     s111_file_paths = []
     for w in workers:

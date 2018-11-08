@@ -28,7 +28,7 @@ MODEL_INDEX_FILE = {
     },
     "dbofs": {
         "index_default_path": "{}indexes/DBOFS_Index_Default_500m.nc".format(SOURCE_PATH),
-        "index_subset_path": "{}indexes/DBOFS_Index_Subgrid_Band4_500m.ncc".format(SOURCE_PATH)
+        "index_subset_path": "{}indexes/DBOFS_Index_Subgrid_Band4_500m.nc".format(SOURCE_PATH)
     }
 }
 

@@ -348,21 +348,20 @@ def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs
         model_output_files = []
         for local_file in local_files:
             model_output_files.append(fvcom.FVCOMFile(local_file))
-        s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
 
     elif MODELS[ofs_model]["model_type"] == "roms":
         index_file = roms.ROMSIndexFile(index_file_path)
         model_output_files = []
         for local_file in local_files:
             model_output_files.append(roms.ROMSFile(local_file))
-        s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
 
     elif MODELS[ofs_model]["model_type"] == "pom":
         index_file = pom.POMIndexFile(index_file_path)
         model_output_files = []
         for local_file in local_files:
             model_output_files.append(pom.POMFile(local_file))
-        s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
+    
+    s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
 
 
 def main():

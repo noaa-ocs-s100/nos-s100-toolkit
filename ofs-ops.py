@@ -23,12 +23,16 @@ DEST_PATH = "/win/ofsdata/%Y%m%d/HDF5/S111_1.0.0/"
 
 MODEL_INDEX_FILE = {
     "cbofs": {
-        "index_default_path": "{}indexes/CBOFS_Index_Default_500m.nc".format(SOURCE_PATH),
-        "index_subset_path": "{}indexes/CBOFS_Index_Subgrid_Band4_500m.nc".format(SOURCE_PATH)
+        "index_default_path": "{}indexes/v0.7.0/cbofs_index_default_500m.nc".format(SOURCE_PATH),
+        "index_subset_path": "{}indexes/v0.7.0/cbofs_index_band4_500m.nc".format(SOURCE_PATH)
     },
     "dbofs": {
-        "index_default_path": "{}indexes/DBOFS_Index_Default_500m.nc".format(SOURCE_PATH),
-        "index_subset_path": "{}indexes/DBOFS_Index_Subgrid_Band4_500m.nc".format(SOURCE_PATH)
+        "index_default_path": "{}indexes/v0.7.0/dbofs_index_default_500m.nc".format(SOURCE_PATH),
+        "index_subset_path": "{}indexes/v0.7.0/dbofs_index_band4_500m.nc".format(SOURCE_PATH)
+    },
+    "nyofs": {
+        "index_default_path": "{}indexes/v0.7.0/nyofs_index_default_500m.nc".format(SOURCE_PATH),
+        "index_subset_path": "{}indexes/v0.7.0/nyofs_index_band4_500m.nc".format(SOURCE_PATH)
     }
 }
 

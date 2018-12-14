@@ -156,7 +156,7 @@ MODELS = {
         "file_name": LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
         "forecast_hours": list(range(0, 53)),
         "cycles": (5, 11, 17, 23),
-        "file_delay": datetime.timedelta(minutes=100),
+        "file_delay": datetime.timedelta(minutes=48),
         "ofs_metadata": s111.S111Metadata('Port_of_New_York_and_New_Jersey', 'POM_Hydrodynamic_Model_Forecasts'),
         "model_type": 'pom'
     },
@@ -167,7 +167,7 @@ MODELS = {
         "file_name": LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
         "forecast_hours": list(range(0, 53)),
         "cycles": (5, 11, 17, 23),
-        "file_delay": datetime.timedelta(minutes=100),
+        "file_delay": datetime.timedelta(minutes=48),
         "ofs_metadata": s111.S111Metadata('Port_of_New_York_and_New_Jersey', 'POM_Hydrodynamic_Model_Forecasts'),
         "model_type": 'pom'
     },
@@ -316,9 +316,6 @@ def download(ofs_model, cycletime, download_dir):
 def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth):
     """Download latest model run and convert to S-111 format.
 
-    Creates a list of paths to NetCDF files downloaded successfully, corresponding
-    with the order specified in `forecasts`.
-
     Args:
         index_file_path: Path to NetCDF index file required for interpolation.
         s111_dir: Path to a parent directory where output S111 HDF5 file(s)
@@ -339,7 +336,7 @@ def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs
             target interpolation depth must be greater or equal to 0.
     """
     local_files = download(ofs_model, cycletime, download_dir)
-    print (download_dir)
+    print(download_dir)
 
     print("Converting files to S111 format...")
 

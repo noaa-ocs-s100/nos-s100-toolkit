@@ -13,6 +13,9 @@ from glob import glob
 import argparse
 
 import ofs
+from s100.model import roms
+from s100.model import fvcom
+from s100.model import pom
 from s100 import s111
 
 # Max number of subprocess workers to spin up
@@ -52,11 +55,32 @@ def run_ofs(ofs_model):
     s111_dir = "{}hdf5/{}/".format(SOURCE_PATH, ofs_model)
     model_dir = "{}{}/".format(DEST_PATH, ofs_model.upper())
 
+    model_output_files = []
+
+    if ofs.MODELS[ofs_model]["model_type"] == "fvcom":
+        index_file_default = fvcom.FVCOMIndexFile(index_default_path)
+        index_file_subset = fvcom.FVCOMIndexFile(index_subset_path)
+        for local_file in local_files:
+            model_output_files.append(fvcom.FVCOMFile(local_file))
+
+    elif ofs.MODELS[ofs_model]["model_type"] == "roms":
+        index_file_default = roms.ROMSIndexFile(index_default_path)
+        index_file_subset = roms.ROMSIndexFile(index_subset_path)
+
+        for local_file in local_files:
+            model_output_files.append(roms.ROMSFile(local_file))
+
+    elif ofs.MODELS[ofs_model]["model_type"] == "pom":
+        index_file_default = pom.POMIndexFile(index_default_path)
+        index_file_subset = pom.POMIndexFile(index_subset_path)
+        for local_file in local_files:
+            model_output_files.append(pom.POMFile(local_file))
+
     # Call default grid processing
-    workers.append(workerPool.apply_async(s111.convert_to_s111, (index_default_path, local_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]["ofs_metadata"], None)))
+    workers.append(workerPool.apply_async(s111.convert_to_s111, (index_file_default, model_output_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]["ofs_metadata"], None)))
 
     # Call subgrid processing
-    workers.append(workerPool.apply_async(s111.convert_to_s111, (index_subset_path, local_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]["ofs_metadata"], None)))
+    workers.append(workerPool.apply_async(s111.convert_to_s111, (index_file_subset, model_output_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]["ofs_metadata"], None)))
 
     s111_file_paths = []
     for w in workers:

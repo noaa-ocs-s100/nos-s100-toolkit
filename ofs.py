@@ -457,6 +457,10 @@ def main():
             os.makedirs(s111_dir)
 
         if args.model_file_path is not None:
+            if args.cycletime is None:
+                print(parser.error("A valid -c/--cycletime matching the input model forecast, must be specified, format must be YYYYMMDD."))
+                return 1
+
             if MODELS[ofs_model]["model_type"] == "fvcom":
                 index_file = fvcom.FVCOMIndexFile(args.index_file_path)
                 model_output_file = fvcom.FVCOMFile(args.model_file_path[0])

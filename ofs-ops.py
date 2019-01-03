@@ -13,10 +13,10 @@ from glob import glob
 import argparse
 
 import ofs
-from s100.model import roms
-from s100.model import fvcom
-from s100.model import pom
-from s100 import s111
+from s100py.model import roms
+from s100py.model import fvcom
+from s100py.model import pom
+from s100py import s111
 
 # Max number of subprocess workers to spin up
 MAXWORKERS = 2

@@ -8,29 +8,33 @@ import os
 from glob import glob
 import sys
 
-from s100.model import roms
-from s100.model import fvcom
-from s100.model import pom
-from s100 import s111
+from thyme.thyme.model import roms
+from thyme.thyme.model import fvcom
+from thyme.thyme.model import pom
+from thyme.thyme.model import hycom
+from s100py import s111
 
 # Base URL of NCEP NOMADS HTTP for accessing CO-OPS OFS NetCDF files
-HTTP_SERVER_NOMADS = "http://nomads.ncep.noaa.gov"
+HTTP_SERVER_NOMADS = "https://nomads.ncep.noaa.gov"
 # Base URL of CO-OPS THREDDS HTTP for accessing CO-OPS OFS NetCDF files
 HTTP_SERVER_THREDDS = "https://opendap.co-ops.nos.noaa.gov"
 
 # Path format of NetCDF files. Forecast initialization (reference) time will be
 # injected using datetime.strftime() and zero-padded forecast designation (e.g.
 # 'f012') will be injected by using str.format().
-# Example:
-# reftime.strftime(HTTP_NETCDF_PATH_FORMAT).format(forecast_str='f012')
+# Example: reftime.strftime(HTTP_NETCDF_PATH_FORMAT).format(forecast_str='f012')
 HTTP_NETCDF_NOMADS_PATH_FORMAT = "/pub/data/nccf/com/nos/prod/{model_str_lc}.%Y%m%d/nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
-HTTP_NETCDF_THREDDS_PATH_FORMAT = "/thredds/fileServer/NOAA/{model_str_uc}/MODELS/%Y%m/nos.{model_str_lc}.fields.forecast.%Y%m%d.t%Hz.nc"
+HTTP_NETCDF_NOMADS_RTOFS_PATH_FORMAT = "/pub/data/nccf/com/{model_str_lc}/prod/{model_str_lc}.%Y%m%d/{model_str_lc}_glo_3dz_{forecast_str}_6hrly_hvr_US_east.nc"
+HTTP_NETCDF_THREDDS_PATH_FORMAT = "/thredds/fileServer/NOAA/{model_str_uc}/MODELS/%Y%m/nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
+HTTP_NETCDF_THREDDS_NYOFS_PATH_FORMAT = "/thredds/fileServer/NOAA/{model_str_uc}/MODELS/%Y%m/nos.{model_str_lc}.fields.forecast.%Y%m%d.t%Hz.nc"
 HTTP_NETCDF_THREDDS_GLOFS_PATH_FORMAT = "/thredds/fileServer/NOAA/{model_str_uc}/MODELS/%Y%m/glofs.{model_str_lc}.fields.forecast.%Y%m%d.t%Hz.nc"
 
 # Folder path of downloaded NetCDF files.
 LOCAL_NETCDF_NOMADS_FILENAME_FORMAT = "nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
-LOCAL_NETCDF_THREDDS_FILENAME_FORMAT = "nos.{model_str_lc}.fields.%Y%m%d.t%Hz.nc"
+LOCAL_NETCDF_THREDDS_FILENAME_FORMAT = "nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc"
+LOCAL_NETCDF_THREDDS_NYOFS_FILENAME_FORMAT = "nos.{model_str_lc}.fields.%Y%m%d.t%Hz.nc"
 LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT = "glofs.{model_str_lc}.fields.%Y%m%d.t%Hz.nc"
+LOCAL_NETCDF_OCS_RTOFS_FILENAME_FORMAT = "{model_str_lc}_glo_3dz_{forecast_str}_6hrly_hvr_US_east.nc"
 
 """
 Model configuration dictionary, where key is the lower-case model identifier
@@ -152,8 +156,8 @@ MODELS = {
     "nyofs": {
         # Hourly output from +1 to +53
         "file_server": HTTP_SERVER_THREDDS,
-        "file_path": HTTP_NETCDF_THREDDS_PATH_FORMAT,
-        "file_name": LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
+        "file_path": HTTP_NETCDF_THREDDS_NYOFS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_THREDDS_NYOFS_FILENAME_FORMAT,
         "forecast_hours": list(range(0, 53)),
         "cycles": (5, 11, 17, 23),
         "file_delay": datetime.timedelta(minutes=48),
@@ -163,8 +167,8 @@ MODELS = {
     "nyofs_fg": {
         # Hourly output from +1 to +53
         "file_server": HTTP_SERVER_THREDDS,
-        "file_path": HTTP_NETCDF_THREDDS_PATH_FORMAT,
-        "file_name": LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
+        "file_path": HTTP_NETCDF_THREDDS_NYOFS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_THREDDS_NYOFS_FILENAME_FORMAT,
         "forecast_hours": list(range(0, 53)),
         "cycles": (5, 11, 17, 23),
         "file_delay": datetime.timedelta(minutes=48),
@@ -214,6 +218,39 @@ MODELS = {
         "file_delay": datetime.timedelta(minutes=100),
         "ofs_metadata": s111.S111Metadata('Lake_Superior', 'POM_Hydrodynamic_Model_Forecasts'),
         "model_type": 'pom'
+    },
+    "rtofs": {
+        # Hourly output from +24 to +72
+        "file_server": HTTP_SERVER_NOMADS,
+        "file_path": HTTP_NETCDF_NOMADS_RTOFS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_OCS_RTOFS_FILENAME_FORMAT,
+        "forecast_hours": list(range(24, 96, 24)),
+        "cycles": (0, 0, 0),
+        "file_delay": datetime.timedelta(minutes=100),
+        "ofs_metadata": s111.S111Metadata('Global_Ocean_Model', 'HYCOM_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'hycom'
+    },
+    "ciofs": {
+        # Hourly output from +1 to +49
+        "file_server": HTTP_SERVER_THREDDS,
+        "file_path": HTTP_NETCDF_THREDDS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
+        "forecast_hours": list(range(1, 49)),
+        "cycles": (0, 6, 12, 18),
+        "file_delay": datetime.timedelta(minutes=100),
+        "ofs_metadata": s111.S111Metadata('Cook_Inlet', 'ROMS_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'roms'
+    },
+    "wcofs": {
+        # Hourly output from +1 to +21
+        "file_server": HTTP_SERVER_THREDDS,
+        "file_path": HTTP_NETCDF_THREDDS_PATH_FORMAT,
+        "file_name": LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
+        "forecast_hours": list(range(1, 21, 3)),
+        "cycles": 3,
+        "file_delay": datetime.timedelta(minutes=100),
+        "ofs_metadata": s111.S111Metadata('West_Coast', 'ROMS_Hydrodynamic_Model_Forecasts'),
+        "model_type": 'roms'
     }
 }
 
@@ -301,9 +338,16 @@ def download(ofs_model, cycletime, download_dir):
     elif MODELS[ofs_model]["file_server"] == HTTP_SERVER_THREDDS:
         if ofs_model == "nyofs_fg":
             url = cycletime.strftime("{}{}".format(MODELS[ofs_model]["file_server"], MODELS[ofs_model]["file_path"])).format(model_str_uc="NYOFS", model_str_lc=ofs_model.lower())
-        else:
+            local_file = "{}/{}".format(download_dir, cycletime.strftime(MODELS[ofs_model]["file_name"]).format(model_str_lc=ofs_model.lower()))
+        elif ofs_model == "nyofs":
             url = cycletime.strftime("{}{}".format(MODELS[ofs_model]["file_server"], MODELS[ofs_model]["file_path"])).format(model_str_uc=ofs_model.upper(), model_str_lc=ofs_model.lower())
-        local_file = "{}/{}".format(download_dir, cycletime.strftime(MODELS[ofs_model]["file_name"]).format(model_str_lc=ofs_model.lower()))
+            local_file = "{}/{}".format(download_dir, cycletime.strftime(MODELS[ofs_model]["file_name"]).format(model_str_lc=ofs_model.lower()))
+        else:
+            for forecast in MODELS[ofs_model]["forecast_hours"]:
+                forecast_str = "f{0:03d}".format(forecast)
+                url = cycletime.strftime("{}{}".format(MODELS[ofs_model]["file_server"], MODELS[ofs_model]["file_path"])).format(model_str_uc=ofs_model.upper(), model_str_lc=ofs_model.lower(), forecast_str=forecast_str)
+                local_file = "{}/{}".format(download_dir, cycletime.strftime(MODELS[ofs_model]["file_name"]).format(model_str_lc=ofs_model.lower(), forecast_str=forecast_str))
+
         print("Downloading {} to {}...".format(url, local_file))
         with urllib.request.urlopen(url) as response, open(local_file, "wb") as out_file:
             shutil.copyfileobj(response, out_file)
@@ -357,6 +401,12 @@ def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs
         model_output_files = []
         for local_file in local_files:
             model_output_files.append(pom.POMFile(local_file))
+
+    elif MODELS[ofs_model]["model_type"] == "hycom":
+        index_file = hycom.HYCOMIndexFile(index_file_path)
+        model_output_files = []
+        for local_file in local_files:
+            model_output_files.append(hycom.HYCOMFile(local_file))
     
     s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
 
@@ -396,7 +446,7 @@ def main():
         try:
             cycletime = datetime.datetime.strptime(cycletime, "%Y%m%d%H")
         except ValueError:
-            parser.error("Invalid -c/--cycletime specified [{}]. Format must be YYYYMMDD.".format(args.cycletime))
+            parser.error("Invalid -c/--cycletime specified [{}]. Format must be YYYYMMDDHH.".format(args.cycletime))
             return 1
     else:
         cycletime = get_latest_cycletime(ofs_model)
@@ -431,6 +481,9 @@ def main():
         elif MODELS[ofs_model]["model_type"] == "pom":
             index_file = pom.POMIndexFile(args.index_file_path)
             model_output_file = pom.POMFile(args.model_file_path[0])
+        elif MODELS[ofs_model]["model_type"] == "hycom":
+            index_file = hycom.HYCOMIndexFile(args.index_file_path)
+            model_output_file = hycom.HYCOMFile(args.model_file_path[0])
 
         try:
             index_file.open()
@@ -470,6 +523,9 @@ def main():
             elif MODELS[ofs_model]["model_type"] == "pom":
                 index_file = pom.POMIndexFile(args.index_file_path)
                 model_output_file = pom.POMFile(args.model_file_path[0])
+            elif MODELS[ofs_model]["model_type"] == "hycom":
+                index_file = hycom.HYCOMIndexFile(args.index_file_path)
+                model_output_file = hycom.HYCOMFile(args.model_file_path[0])
 
             s111.convert_to_s111(index_file, [model_output_file], s111_dir, cycletime, ofs_model, MODELS[ofs_model]["ofs_metadata"], target_depth)
 

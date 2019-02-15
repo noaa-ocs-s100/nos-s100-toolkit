@@ -12,11 +12,12 @@ import os
 from glob import glob
 import argparse
 
-import ofs
-from s100py.model import roms
-from s100py.model import fvcom
-from s100py.model import pom
 from s100py import s111
+from thyme.model import roms
+from thyme.model import fvcom
+from thyme.model import pom
+
+import ofs
 
 # Max number of subprocess workers to spin up
 MAXWORKERS = 2

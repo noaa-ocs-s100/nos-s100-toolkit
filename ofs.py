@@ -8,11 +8,11 @@ import os
 from glob import glob
 import sys
 
-from thyme.thyme.model import roms
-from thyme.thyme.model import fvcom
-from thyme.thyme.model import pom
-from thyme.thyme.model import hycom
 from s100py import s111
+from thyme.model import roms
+from thyme.model import fvcom
+from thyme.model import pom
+from thyme.model import hycom
 
 # Base URL of NCEP NOMADS HTTP for accessing CO-OPS OFS NetCDF files
 HTTP_SERVER_NOMADS = "https://nomads.ncep.noaa.gov"

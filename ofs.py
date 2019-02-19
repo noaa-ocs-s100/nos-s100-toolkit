@@ -36,6 +36,11 @@ LOCAL_NETCDF_THREDDS_NYOFS_FILENAME_FORMAT = 'nos.{model_str_lc}.fields.%Y%m%d.t
 LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT = 'glofs.{model_str_lc}.fields.%Y%m%d.t%Hz.nc'
 LOCAL_NETCDF_OCS_RTOFS_FILENAME_FORMAT = '{model_str_lc}_glo_3dz_{forecast_str}_6hrly_hvr_US_east.nc'
 
+MODELTYPE_FVCOM = 'fvcom'
+MODELTYPE_HYCOM = 'hycom'
+MODELTYPE_POM = 'pom'
+MODELTYPE_ROMS = 'roms'
+
 """
 Model configuration dictionary, where key is the lower-case model identifier
 and value is another dictionary with the following properties:
@@ -59,7 +64,7 @@ MODELS = {
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=85),
         'ofs_metadata': s111.S111Metadata('Chesapeake_Bay', 'ROMS_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'roms'
+        'model_type': MODELTYPE_ROMS
 
     },
     'gomofs': {
@@ -71,7 +76,7 @@ MODELS = {
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=134),
         'ofs_metadata': s111.S111Metadata('Gulf_of_Maine', 'ROMS_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'roms'
+        'model_type': MODELTYPE_ROMS
 
     },
     'dbofs': {
@@ -83,7 +88,7 @@ MODELS = {
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=80),
         'ofs_metadata': s111.S111Metadata('Delaware_Bay', 'ROMS_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'roms'
+        'model_type': MODELTYPE_ROMS
 
     },
     'tbofs': {
@@ -95,7 +100,7 @@ MODELS = {
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=74),
         'ofs_metadata': s111.S111Metadata('Tampa_Bay', 'ROMS_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'roms'
+        'model_type': MODELTYPE_ROMS
 
     },
     'negofs': {
@@ -107,7 +112,7 @@ MODELS = {
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=95),
         'ofs_metadata': s111.S111Metadata('Northeast_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'fvcom'
+        'model_type': MODELTYPE_FVCOM
     },
     'nwgofs': {
         # Hourly output from +1 to +48
@@ -118,7 +123,7 @@ MODELS = {
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=90),
         'ofs_metadata': s111.S111Metadata('Northwest_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'fvcom'
+        'model_type': MODELTYPE_FVCOM
     },
     'ngofs': {
         # Hourly output from +1 to +48
@@ -129,7 +134,7 @@ MODELS = {
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=50),
         'ofs_metadata': s111.S111Metadata('Northern_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'fvcom'
+        'model_type': MODELTYPE_FVCOM
     },
     'sfbofs': {
         # Hourly output from +1 to +48
@@ -140,7 +145,7 @@ MODELS = {
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=55),
         'ofs_metadata': s111.S111Metadata('San_Francisco_Bay', 'FVCOM_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'fvcom'
+        'model_type': MODELTYPE_FVCOM
     },
     'leofs': {
         # Hourly output from +1 to +48
@@ -151,7 +156,7 @@ MODELS = {
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
         'ofs_metadata': s111.S111Metadata('Lake_Erie', 'FVCOM_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'fvcom'
+        'model_type': MODELTYPE_FVCOM
     },
     'nyofs': {
         # Hourly output from +1 to +53
@@ -162,7 +167,7 @@ MODELS = {
         'cycles': (5, 11, 17, 23),
         'file_delay': datetime.timedelta(minutes=48),
         'ofs_metadata': s111.S111Metadata('Port_of_New_York_and_New_Jersey', 'POM_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'pom'
+        'model_type': MODELTYPE_POM
     },
     'nyofs_fg': {
         # Hourly output from +1 to +53
@@ -173,7 +178,7 @@ MODELS = {
         'cycles': (5, 11, 17, 23),
         'file_delay': datetime.timedelta(minutes=48),
         'ofs_metadata': s111.S111Metadata('Port_of_New_York_and_New_Jersey', 'POM_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'pom'
+        'model_type': MODELTYPE_POM
     },
     'lmofs': {
         # Hourly output from +1 to +59
@@ -184,7 +189,7 @@ MODELS = {
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
         'ofs_metadata': s111.S111Metadata('Lake_Michigan', 'POM_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'pom'
+        'model_type': MODELTYPE_POM
     },
     'lhofs': {
         # Hourly output from +1 to +59
@@ -195,7 +200,7 @@ MODELS = {
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
         'ofs_metadata': s111.S111Metadata('Lake_Huron', 'POM_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'pom'
+        'model_type': MODELTYPE_POM
     },
     'loofs': {
         # Hourly output from +1 to +59
@@ -206,7 +211,7 @@ MODELS = {
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
         'ofs_metadata': s111.S111Metadata('Lake_Ontario', 'POM_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'pom'
+        'model_type': MODELTYPE_POM
     },
     'lsofs': {
         # Hourly output from +1 to +59
@@ -217,7 +222,7 @@ MODELS = {
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
         'ofs_metadata': s111.S111Metadata('Lake_Superior', 'POM_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'pom'
+        'model_type': MODELTYPE_POM
     },
     'rtofs': {
         # Hourly output from +24 to +72
@@ -228,7 +233,7 @@ MODELS = {
         'cycles': (0,),
         'file_delay': datetime.timedelta(minutes=100),
         'ofs_metadata': s111.S111Metadata('Global_Ocean_Model', 'HYCOM_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'hycom'
+        'model_type': MODELTYPE_HYCOM
     },
     'ciofs': {
         # Hourly output from +1 to +49
@@ -239,7 +244,7 @@ MODELS = {
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
         'ofs_metadata': s111.S111Metadata('Cook_Inlet', 'ROMS_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'roms'
+        'model_type': MODELTYPE_ROMS
     },
     'wcofs': {
         # Hourly output from +1 to +21
@@ -250,7 +255,7 @@ MODELS = {
         'cycles': 3,
         'file_delay': datetime.timedelta(minutes=100),
         'ofs_metadata': s111.S111Metadata('West_Coast', 'ROMS_Hydrodynamic_Model_Forecasts'),
-        'model_type': 'roms'
+        'model_type': MODELTYPE_ROMS
     }
 }
 
@@ -384,25 +389,25 @@ def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs
 
     print('Converting files to S111 format...')
 
-    if MODELS[ofs_model]['model_type'] == 'fvcom':
+    if MODELS[ofs_model]['model_type'] == MODELTYPE_FVCOM:
         index_file = fvcom.FVCOMIndexFile(index_file_path)
         model_output_files = []
         for local_file in local_files:
             model_output_files.append(fvcom.FVCOMFile(local_file))
 
-    elif MODELS[ofs_model]['model_type'] == 'roms':
+    elif MODELS[ofs_model]['model_type'] == MODELTYPE_ROMS:
         index_file = roms.ROMSIndexFile(index_file_path)
         model_output_files = []
         for local_file in local_files:
             model_output_files.append(roms.ROMSFile(local_file))
 
-    elif MODELS[ofs_model]['model_type'] == 'pom':
+    elif MODELS[ofs_model]['model_type'] == MODELTYPE_POM:
         index_file = pom.POMIndexFile(index_file_path)
         model_output_files = []
         for local_file in local_files:
             model_output_files.append(pom.POMFile(local_file))
 
-    elif MODELS[ofs_model]['model_type'] == 'hycom':
+    elif MODELS[ofs_model]['model_type'] == MODELTYPE_HYCOM:
         index_file = hycom.HYCOMIndexFile(index_file_path)
         model_output_files = []
         for local_file in local_files:
@@ -472,16 +477,16 @@ def main():
             parser.error('Specified land/shoreline shapefile does not exist [{}]'.format(args.land_shp))
             return 1
 
-        if MODELS[ofs_model]['model_type'] == 'fvcom':
+        if MODELS[ofs_model]['model_type'] == MODELTYPE_FVCOM:
             index_file = fvcom.FVCOMIndexFile(args.index_file_path)
             model_output_file = fvcom.FVCOMFile(args.model_file_path[0])
-        elif MODELS[ofs_model]['model_type'] == 'roms':
+        elif MODELS[ofs_model]['model_type'] == MODELTYPE_ROMS:
             index_file = roms.ROMSIndexFile(args.index_file_path)
             model_output_file = roms.ROMSFile(args.model_file_path[0])
-        elif MODELS[ofs_model]['model_type'] == 'pom':
+        elif MODELS[ofs_model]['model_type'] == MODELTYPE_POM:
             index_file = pom.POMIndexFile(args.index_file_path)
             model_output_file = pom.POMFile(args.model_file_path[0])
-        elif MODELS[ofs_model]['model_type'] == 'hycom':
+        elif MODELS[ofs_model]['model_type'] == MODELTYPE_HYCOM:
             index_file = hycom.HYCOMIndexFile(args.index_file_path)
             model_output_file = hycom.HYCOMFile(args.model_file_path[0])
 
@@ -514,16 +519,16 @@ def main():
                 print(parser.error('A valid -c/--cycletime matching the input model forecast, must be specified, format must be YYYYMMDD.'))
                 return 1
 
-            if MODELS[ofs_model]['model_type'] == 'fvcom':
+            if MODELS[ofs_model]['model_type'] == MODELTYPE_FVCOM:
                 index_file = fvcom.FVCOMIndexFile(args.index_file_path)
                 model_output_file = fvcom.FVCOMFile(args.model_file_path[0])
-            elif MODELS[ofs_model]['model_type'] == 'roms':
+            elif MODELS[ofs_model]['model_type'] == MODELTYPE_ROMS:
                 index_file = roms.ROMSIndexFile(args.index_file_path)
                 model_output_file = roms.ROMSFile(args.model_file_path[0])
-            elif MODELS[ofs_model]['model_type'] == 'pom':
+            elif MODELS[ofs_model]['model_type'] == MODELTYPE_POM:
                 index_file = pom.POMIndexFile(args.index_file_path)
                 model_output_file = pom.POMFile(args.model_file_path[0])
-            elif MODELS[ofs_model]['model_type'] == 'hycom':
+            elif MODELS[ofs_model]['model_type'] == MODELTYPE_HYCOM:
                 index_file = hycom.HYCOMIndexFile(args.index_file_path)
                 model_output_file = hycom.HYCOMFile(args.model_file_path[0])
 

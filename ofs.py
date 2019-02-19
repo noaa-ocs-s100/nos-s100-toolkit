@@ -235,17 +235,18 @@ MODELS = {
         'ofs_metadata': s111.S111Metadata('Global_Ocean_Model', 'HYCOM_Hydrodynamic_Model_Forecasts'),
         'model_type': MODELTYPE_HYCOM
     },
-    'ciofs': {
-        # Hourly output from +1 to +49
-        'file_server': HTTP_SERVER_THREDDS,
-        'file_path': HTTP_NETCDF_THREDDS_PATH_FORMAT,
-        'file_name': LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
-        'forecast_hours': list(range(1, 49)),
-        'cycles': (0, 6, 12, 18),
-        'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Cook_Inlet', 'ROMS_Hydrodynamic_Model_Forecasts'),
-        'model_type': MODELTYPE_ROMS
-    },
+    # Disable CIOFS support until wetting/drying handled properly by ROMS module
+    #'ciofs': {
+    #    # Hourly output from +1 to +49
+    #    'file_server': HTTP_SERVER_THREDDS,
+    #    'file_path': HTTP_NETCDF_THREDDS_PATH_FORMAT,
+    #    'file_name': LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
+    #    'forecast_hours': list(range(1, 49)),
+    #    'cycles': (0, 6, 12, 18),
+    #    'file_delay': datetime.timedelta(minutes=100),
+    #    'ofs_metadata': s111.S111Metadata('Cook_Inlet', 'ROMS_Hydrodynamic_Model_Forecasts'),
+    #    'model_type': MODELTYPE_ROMS
+    #},
     'wcofs': {
         # Hourly output from +1 to +21
         'file_server': HTTP_SERVER_THREDDS,

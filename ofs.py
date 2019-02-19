@@ -225,7 +225,7 @@ MODELS = {
         'file_path': HTTP_NETCDF_NOMADS_RTOFS_PATH_FORMAT,
         'file_name': LOCAL_NETCDF_OCS_RTOFS_FILENAME_FORMAT,
         'forecast_hours': list(range(24, 96, 24)),
-        'cycles': (0, 0, 0),
+        'cycles': (0,),
         'file_delay': datetime.timedelta(minutes=100),
         'ofs_metadata': s111.S111Metadata('Global_Ocean_Model', 'HYCOM_Hydrodynamic_Model_Forecasts'),
         'model_type': 'hycom'

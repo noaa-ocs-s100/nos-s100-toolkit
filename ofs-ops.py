@@ -16,6 +16,7 @@ from s100py import s111
 from thyme.model import roms
 from thyme.model import fvcom
 from thyme.model import pom
+from thyme.model import hycom
 
 import ofs
 
@@ -27,16 +28,20 @@ DEST_PATH = '/win/ofsdata/%Y%m%d/HDF5/S111_1.0.0/'
 
 MODEL_INDEX_FILE = {
     'cbofs': {
-        'index_default_path': '{}indexes/v0.7.0/cbofs_index_default_500m.nc'.format(SOURCE_PATH),
-        'index_subset_path': '{}indexes/v0.7.0/cbofs_index_band4_500m.nc'.format(SOURCE_PATH)
+        'index_default_path': '{}indexes/v0.8.0/cbofs_index_default_500m.nc'.format(SOURCE_PATH),
+        'index_subset_path': '{}indexes/v0.8.0/cbofs_index_band4v4_500m.nc'.format(SOURCE_PATH)
     },
     'dbofs': {
-        'index_default_path': '{}indexes/v0.7.0/dbofs_index_default_500m.nc'.format(SOURCE_PATH),
-        'index_subset_path': '{}indexes/v0.7.0/dbofs_index_band4_500m.nc'.format(SOURCE_PATH)
+        'index_default_path': '{}indexes/v0.8.0/dbofs_index_default_500m.nc'.format(SOURCE_PATH),
+        'index_subset_path': '{}indexes/v0.8.0/dbofs_index_band4v4_500m.nc'.format(SOURCE_PATH)
     },
     'nyofs': {
-        'index_default_path': '{}indexes/v0.7.0/nyofs_index_default_500m.nc'.format(SOURCE_PATH),
-        'index_subset_path': '{}indexes/v0.7.0/nyofs_index_band4_500m.nc'.format(SOURCE_PATH)
+        'index_default_path': '{}indexes/v0.8.0/nyofs_index_default_500m.nc'.format(SOURCE_PATH),
+        'index_subset_path': '{}indexes/v0.8.0/nyofs_index_band4v4_500m.nc'.format(SOURCE_PATH)
+    },
+    'rtofs': {
+        'index_default_path': '{}indexes/v0.8.0/rtofs_index_us_east_8500m.nc'.format(SOURCE_PATH),
+        'index_subset_path': '{}indexes/v0.8.0/rtofs_index_band2v4_8500m.nc'.format(SOURCE_PATH)
     }
 }
 
@@ -67,7 +72,6 @@ def run_ofs(ofs_model):
     elif ofs.MODELS[ofs_model]['model_type'] == 'roms':
         index_file_default = roms.ROMSIndexFile(index_default_path)
         index_file_subset = roms.ROMSIndexFile(index_subset_path)
-
         for local_file in local_files:
             model_output_files.append(roms.ROMSFile(local_file))
 
@@ -76,6 +80,12 @@ def run_ofs(ofs_model):
         index_file_subset = pom.POMIndexFile(index_subset_path)
         for local_file in local_files:
             model_output_files.append(pom.POMFile(local_file))
+
+    elif ofs.MODELS[ofs_model]['model_type'] == 'hycom':
+        index_file_default = hycom.HYCOMIndexFile(index_default_path)
+        index_file_subset = hycom.HYCOMIndexFile(index_subset_path)
+        for local_file in local_files:
+            model_output_files.append(hycom.HYCOMFile(local_file))
 
     # Call default grid processing
     workers.append(workerPool.apply_async(s111.convert_to_s111, (index_file_default, model_output_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]['ofs_metadata'], None)))

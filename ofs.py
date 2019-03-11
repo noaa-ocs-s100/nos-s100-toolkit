@@ -63,7 +63,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=85),
-        'ofs_metadata': s111.S111Metadata('Chesapeake_Bay', 'ROMS_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Chesapeake_Bay', 'ROMS_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_ROMS
 
     },
@@ -75,7 +75,7 @@ MODELS = {
         'forecast_hours': list(range(3, 73, 3)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=134),
-        'ofs_metadata': s111.S111Metadata('Gulf_of_Maine', 'ROMS_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Gulf_of_Maine', 'ROMS_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_ROMS
 
     },
@@ -87,7 +87,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=80),
-        'ofs_metadata': s111.S111Metadata('Delaware_Bay', 'ROMS_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Delaware_Bay', 'ROMS_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_ROMS
 
     },
@@ -99,7 +99,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=74),
-        'ofs_metadata': s111.S111Metadata('Tampa_Bay', 'ROMS_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Tampa_Bay', 'ROMS_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_ROMS
 
     },
@@ -111,7 +111,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=95),
-        'ofs_metadata': s111.S111Metadata('Northeast_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Northeast_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_FVCOM
     },
     'nwgofs': {
@@ -122,7 +122,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=90),
-        'ofs_metadata': s111.S111Metadata('Northwest_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Northwest_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_FVCOM
     },
     'ngofs': {
@@ -133,7 +133,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=50),
-        'ofs_metadata': s111.S111Metadata('Northern_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Northern_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_FVCOM
     },
     'sfbofs': {
@@ -144,7 +144,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=55),
-        'ofs_metadata': s111.S111Metadata('San_Francisco_Bay', 'FVCOM_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('San_Francisco_Bay', 'FVCOM_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_FVCOM
     },
     'leofs': {
@@ -155,7 +155,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Erie', 'FVCOM_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Lake_Erie', 'FVCOM_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_FVCOM
     },
     'nyofs': {
@@ -166,7 +166,7 @@ MODELS = {
         'forecast_hours': list(range(0, 53)),
         'cycles': (5, 11, 17, 23),
         'file_delay': datetime.timedelta(minutes=48),
-        'ofs_metadata': s111.S111Metadata('Port_of_New_York_and_New_Jersey', 'POM_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Port_of_New_York_and_New_Jersey', 'POM_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_POM
     },
     'nyofs_fg': {
@@ -177,7 +177,7 @@ MODELS = {
         'forecast_hours': list(range(0, 53)),
         'cycles': (5, 11, 17, 23),
         'file_delay': datetime.timedelta(minutes=48),
-        'ofs_metadata': s111.S111Metadata('Port_of_New_York_and_New_Jersey', 'POM_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Port_of_New_York_and_New_Jersey', 'POM_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_POM
     },
     'lmofs': {
@@ -188,7 +188,7 @@ MODELS = {
         'forecast_hours': list(range(0, 59)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Michigan', 'POM_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Lake_Michigan', 'POM_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_POM
     },
     'lhofs': {
@@ -199,7 +199,7 @@ MODELS = {
         'forecast_hours': list(range(0, 59)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Huron', 'POM_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Lake_Huron', 'POM_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_POM
     },
     'loofs': {
@@ -210,7 +210,7 @@ MODELS = {
         'forecast_hours': list(range(0, 59)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Ontario', 'POM_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Lake_Ontario', 'POM_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_POM
     },
     'lsofs': {
@@ -221,7 +221,7 @@ MODELS = {
         'forecast_hours': list(range(0, 59)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Superior', 'POM_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Lake_Superior', 'POM_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_POM
     },
     'rtofs': {
@@ -232,7 +232,7 @@ MODELS = {
         'forecast_hours': list(range(24, 96, 24)),
         'cycles': (0,),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Global_Ocean_Model', 'HYCOM_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('Global_Ocean_Model', 'HYCOM_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_HYCOM
     },
     # Disable CIOFS support until wetting/drying handled properly by ROMS module
@@ -244,7 +244,7 @@ MODELS = {
     #    'forecast_hours': list(range(1, 49)),
     #    'cycles': (0, 6, 12, 18),
     #    'file_delay': datetime.timedelta(minutes=100),
-    #    'ofs_metadata': s111.S111Metadata('Cook_Inlet', 'ROMS_Hydrodynamic_Model_Forecasts'),
+    #    'ofs_metadata': s111.S111Metadata('Cook_Inlet', 'ROMS_Hydrodynamic_Model_Forecasts', 'US'),
     #    'model_type': MODELTYPE_ROMS
     #},
     'wcofs': {
@@ -255,7 +255,7 @@ MODELS = {
         'forecast_hours': list(range(1, 21, 3)),
         'cycles': 3,
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('West_Coast', 'ROMS_Hydrodynamic_Model_Forecasts'),
+        'ofs_metadata': s111.S111Metadata('West_Coast', 'ROMS_Hydrodynamic_Model_Forecasts', 'US'),
         'model_type': MODELTYPE_ROMS
     }
 }
@@ -363,7 +363,7 @@ def download(ofs_model, cycletime, download_dir):
     return local_files
 
 
-def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth):
+def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs_model, ofs_metadata, data_coding_format, target_depth):
     """Download latest model run and convert to S-111 format.
 
     Args:
@@ -381,6 +381,8 @@ def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs
         ofs_metadata: `S111Metadata` instance describing metadata for geographic
             identifier and description of current meter type, forecast method,
             or model.
+        data_coding_format: 1:Time series at fixed stations, 2:Regularly gridded arrays,
+            3:Ungeorectified gridded arrays, 4:Time series for one moving platform.
         target_depth: The water current at a specified target depth below
             the sea surface in meters, default target depth is 4.5 meters,
             target interpolation depth must be greater or equal to 0.
@@ -390,37 +392,60 @@ def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs
 
     print('Converting files to S111 format...')
 
-    if MODELS[ofs_model]['model_type'] == MODELTYPE_FVCOM:
-        index_file = fvcom.FVCOMIndexFile(index_file_path)
-        model_output_files = []
-        for local_file in local_files:
-            model_output_files.append(fvcom.FVCOMFile(local_file))
+    if data_coding_format == 2:
+        if MODELS[ofs_model]['model_type'] == MODELTYPE_FVCOM:
+            index_file = fvcom.FVCOMIndexFile(index_file_path)
+            model_output_files = []
+            for local_file in local_files:
+                model_output_files.append(fvcom.FVCOMFile(local_file))
 
-    elif MODELS[ofs_model]['model_type'] == MODELTYPE_ROMS:
-        index_file = roms.ROMSIndexFile(index_file_path)
-        model_output_files = []
-        for local_file in local_files:
-            model_output_files.append(roms.ROMSFile(local_file))
+        elif MODELS[ofs_model]['model_type'] == MODELTYPE_ROMS:
+            index_file = roms.ROMSIndexFile(index_file_path)
+            model_output_files = []
+            for local_file in local_files:
+                model_output_files.append(roms.ROMSFile(local_file))
 
-    elif MODELS[ofs_model]['model_type'] == MODELTYPE_POM:
-        index_file = pom.POMIndexFile(index_file_path)
-        model_output_files = []
-        for local_file in local_files:
-            model_output_files.append(pom.POMFile(local_file))
+        elif MODELS[ofs_model]['model_type'] == MODELTYPE_POM:
+            index_file = pom.POMIndexFile(index_file_path)
+            model_output_files = []
+            for local_file in local_files:
+                model_output_files.append(pom.POMFile(local_file))
 
-    elif MODELS[ofs_model]['model_type'] == MODELTYPE_HYCOM:
-        index_file = hycom.HYCOMIndexFile(index_file_path)
-        model_output_files = []
-        for local_file in local_files:
-            model_output_files.append(hycom.HYCOMFile(local_file))
-    
-    s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata, target_depth)
+        elif MODELS[ofs_model]['model_type'] == MODELTYPE_HYCOM:
+            index_file = hycom.HYCOMIndexFile(index_file_path)
+            model_output_files = []
+            for local_file in local_files:
+                model_output_files.append(hycom.HYCOMFile(local_file))
+
+    elif data_coding_format == 3:
+        if MODELS[ofs_model]['model_type'] == MODELTYPE_FVCOM:
+            model_output_files = []
+            for local_file in local_files:
+                model_output_files.append(fvcom.FVCOMFile(local_file))
+
+        elif MODELS[ofs_model]['model_type'] == MODELTYPE_ROMS:
+            model_output_files = []
+            for local_file in local_files:
+                model_output_files.append(roms.ROMSFile(local_file))
+
+        elif MODELS[ofs_model]['model_type'] == MODELTYPE_POM:
+            model_output_files = []
+            for local_file in local_files:
+                model_output_files.append(pom.POMFile(local_file))
+
+        elif MODELS[ofs_model]['model_type'] == MODELTYPE_HYCOM:
+            model_output_files = []
+            for local_file in local_files:
+                model_output_files.append(hycom.HYCOMFile(local_file))
+
+    s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata,
+                         data_coding_format, target_depth)
 
 
 def main():
     """Parse command line arguments and execute target functions."""
     parser = argparse.ArgumentParser(description='Convert surface currents model output to S-111 HDF5 format')
-    parser.add_argument('-i', '--index_file_path', help='Path to existing or to-be-created index netcdf file. This file contains regular grid definition and interpolation parameters, and is required to convert model output to S111 HDF5 format. If -b/--build_index is specified, any existing file at the specified path will be overwritten.', required=True)
+    parser.add_argument('-i', '--index_file_path', help='Path to existing or to-be-created index netcdf file. This file contains regular grid definition and interpolation parameters, and is required to convert model output to S111 HDF5 format. If -b/--build_index is specified, any existing file at the specified path will be overwritten.')
     parser.add_argument('-s', '--s111_dir', help='Path to a directory where generated S-111 HDF5 file(s) will be generated. Generated files will be placed in a subdirectory named to match the model identifier (e.g. \'cbofs\') and files will be auto-named using identifying information (e.g. model reference/cycle time, subgrid id) and with the .h5 file extension. Ignored if -b/--build_index is specified.')
     parser.add_argument('-b', '--build_index', action='store_true', help='Build a new index NetCDF file at the path specified by -i/--index_file_path. This file must be generated before processing any model output, as it will contain the regular grid definition and interpolation parameters. Once created, it can be used indefinitely for the target model unless changes to the regular grid extent/resolution are required or if the underlying model grid changes.')
     parser.add_argument('-g', '--grid_shp', help='Path to a polygon grid shapefile that will be used to generate matching subgrids when generating an index file. Only used when -b/--build_index is specified. If not specified, the model extent will be used to generate the index file and no subsetting will occur. Ignored if -b/--build_index is not specified.')
@@ -432,6 +457,7 @@ def main():
     parser.add_argument('-c', '--cycletime', help='Model cycle time (i.e. initialization/reference time) to process, in the format YYYYMMDDHH. If not specified, the most recent cycle will be calculated using configured thresholds and present system time.')
     parser.add_argument('-t', '--target_cellsize_meters', help='Target cellsize of regular grid cells in meters. Actual size of x/y grid cells will vary slightly, since the regular grid uses lat/lon coordinates (thus a cell\'s width/height in meters will vary by latitude), and since it will be adjusted in order to fit a whole number of grid cells in the x and y directions within the calculated grid extent.')
     parser.add_argument('-z', '--target_depth', help='The water current at a specified target depth below the sea surface in meters, default target depth is 4.5 meters. Target interpolation depth must be greater or equal to 0.')
+    parser.add_argument('-code', '--data_coding_format', help='Data format type, 1 - time series fixed station, 2 - regular grid, 3 - ungeorectified grid, 4 - time series moving platform.')
     args = parser.parse_args()
 
     ofs_model = args.ofs_model
@@ -446,6 +472,8 @@ def main():
         if target_depth < 0:
             parser.error('Invalid entry, depth must be positive')
             return 1
+
+    data_coding_format = int(args.data_coding_format)
 
     cycletime = args.cycletime
     if cycletime is not None:
@@ -504,7 +532,7 @@ def main():
     elif not os.path.isdir(args.s111_dir):
         parser.error('Invalid/missing S-111 output directory (-s/-s111_dir) specified.')
         return 1
-    else:
+    elif data_coding_format == 2:
         if not os.path.exists(args.index_file_path):
             parser.error('Specified index file does not exist [{}]'.format(args.index_file_path))
             return 1
@@ -533,14 +561,52 @@ def main():
                 index_file = hycom.HYCOMIndexFile(args.index_file_path)
                 model_output_file = hycom.HYCOMFile(args.model_file_path[0])
 
-            s111.convert_to_s111(index_file, [model_output_file], s111_dir, cycletime, ofs_model, MODELS[ofs_model]['ofs_metadata'], target_depth)
+            s111.convert_to_s111(index_file, [model_output_file], s111_dir, cycletime, ofs_model,
+                                 MODELS[ofs_model]['ofs_metadata'], data_coding_format, target_depth)
 
         else:
             if not args.download_dir or not os.path.isdir(args.download_dir):
                 parser.error('Invalid/missing download directory (-d/--download_dir) specified.')
                 return 1
 
-            download_and_process(args.index_file_path, args.download_dir, s111_dir, cycletime, ofs_model, MODELS[ofs_model]['ofs_metadata'], target_depth)
+            download_and_process(args.index_file_path, args.download_dir, s111_dir, cycletime, ofs_model,
+                                 MODELS[ofs_model]['ofs_metadata'], data_coding_format, target_depth)
+
+    elif data_coding_format == 3:
+        s111_dir = args.s111_dir
+        if not s111_dir.endswith('/'):
+            s111_dir += '/'
+        s111_dir += ofs_model.lower()
+        if not os.path.isdir(s111_dir):
+            os.makedirs(s111_dir)
+
+        if args.model_file_path is not None:
+            if args.cycletime is None:
+                print(parser.error(
+                    'A valid -c/--cycletime matching the input model forecast, must be specified, format must be YYYYMMDD.'))
+                return 1
+
+            if MODELS[ofs_model]['model_type'] == MODELTYPE_FVCOM:
+                model_output_file = fvcom.FVCOMFile(args.model_file_path[0])
+            elif MODELS[ofs_model]['model_type'] == MODELTYPE_ROMS:
+                model_output_file = roms.ROMSFile(args.model_file_path[0])
+            elif MODELS[ofs_model]['model_type'] == MODELTYPE_POM:
+                model_output_file = pom.POMFile(args.model_file_path[0])
+            elif MODELS[ofs_model]['model_type'] == MODELTYPE_HYCOM:
+                model_output_file = hycom.HYCOMFile(args.model_file_path[0])
+
+            index_file = None
+            s111.convert_to_s111(index_file, [model_output_file], s111_dir, cycletime, ofs_model,
+                                 MODELS[ofs_model]['ofs_metadata'], data_coding_format, target_depth)
+
+        else:
+            if not args.download_dir or not os.path.isdir(args.download_dir):
+                parser.error('Invalid/missing download directory (-d/--download_dir) specified.')
+                return 1
+
+            index_file = None
+            download_and_process(index_file, args.download_dir, s111_dir, cycletime, ofs_model,
+                                 MODELS[ofs_model]['ofs_metadata'], data_coding_format, target_depth)
 
     return 0
 

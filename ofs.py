@@ -41,6 +41,13 @@ MODELTYPE_HYCOM = 'hycom'
 MODELTYPE_POM = 'pom'
 MODELTYPE_ROMS = 'roms'
 
+PRODUCT_DESCRIPTION_FVCOM = 'FVCOM_Hydrodynamic_Model_Forecasts'
+PRODUCT_DESCRIPTION_HYCOM = 'HYCOM_Hydrodynamic_Model_Forecasts'
+PRODUCT_DESCRIPTION_POM = 'POM_Hydrodynamic_Model_Forecasts'
+PRODUCT_DESCRIPTION_ROMS = 'ROMS_Hydrodynamic_Model_Forecasts'
+
+PRODUCERCODE_US = 'US'
+
 """
 Model configuration dictionary, where key is the lower-case model identifier
 and value is another dictionary with the following properties:
@@ -63,7 +70,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=85),
-        'ofs_metadata': s111.S111Metadata('Chesapeake_Bay', 'ROMS_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Chesapeake_Bay', PRODUCT_DESCRIPTION_ROMS, PRODUCERCODE_US),
         'model_type': MODELTYPE_ROMS
 
     },
@@ -75,7 +82,7 @@ MODELS = {
         'forecast_hours': list(range(3, 73, 3)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=134),
-        'ofs_metadata': s111.S111Metadata('Gulf_of_Maine', 'ROMS_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Gulf_of_Maine', PRODUCT_DESCRIPTION_ROMS, PRODUCERCODE_US),
         'model_type': MODELTYPE_ROMS
 
     },
@@ -87,7 +94,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=80),
-        'ofs_metadata': s111.S111Metadata('Delaware_Bay', 'ROMS_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Delaware_Bay', PRODUCT_DESCRIPTION_ROMS, PRODUCERCODE_US),
         'model_type': MODELTYPE_ROMS
 
     },
@@ -99,7 +106,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=74),
-        'ofs_metadata': s111.S111Metadata('Tampa_Bay', 'ROMS_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Tampa_Bay', PRODUCT_DESCRIPTION_ROMS, PRODUCERCODE_US),
         'model_type': MODELTYPE_ROMS
 
     },
@@ -111,7 +118,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=95),
-        'ofs_metadata': s111.S111Metadata('Northeast_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Northeast_Gulf_of_Mexico', PRODUCT_DESCRIPTION_FVCOM, PRODUCERCODE_US),
         'model_type': MODELTYPE_FVCOM
     },
     'nwgofs': {
@@ -122,7 +129,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=90),
-        'ofs_metadata': s111.S111Metadata('Northwest_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Northwest_Gulf_of_Mexico', PRODUCT_DESCRIPTION_FVCOM, PRODUCERCODE_US),
         'model_type': MODELTYPE_FVCOM
     },
     'ngofs': {
@@ -133,7 +140,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=50),
-        'ofs_metadata': s111.S111Metadata('Northern_Gulf_of_Mexico', 'FVCOM_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Northern_Gulf_of_Mexico', PRODUCT_DESCRIPTION_FVCOM, PRODUCERCODE_US),
         'model_type': MODELTYPE_FVCOM
     },
     'sfbofs': {
@@ -144,7 +151,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=55),
-        'ofs_metadata': s111.S111Metadata('San_Francisco_Bay', 'FVCOM_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('San_Francisco_Bay', PRODUCT_DESCRIPTION_FVCOM, PRODUCERCODE_US),
         'model_type': MODELTYPE_FVCOM
     },
     'leofs': {
@@ -155,7 +162,7 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Erie', 'FVCOM_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Lake_Erie', PRODUCT_DESCRIPTION_FVCOM, PRODUCERCODE_US),
         'model_type': MODELTYPE_FVCOM
     },
     'nyofs': {
@@ -166,7 +173,7 @@ MODELS = {
         'forecast_hours': list(range(0, 53)),
         'cycles': (5, 11, 17, 23),
         'file_delay': datetime.timedelta(minutes=48),
-        'ofs_metadata': s111.S111Metadata('Port_of_New_York_and_New_Jersey', 'POM_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Port_of_New_York_and_New_Jersey', PRODUCT_DESCRIPTION_POM, PRODUCERCODE_US),
         'model_type': MODELTYPE_POM
     },
     'nyofs_fg': {
@@ -177,7 +184,7 @@ MODELS = {
         'forecast_hours': list(range(0, 53)),
         'cycles': (5, 11, 17, 23),
         'file_delay': datetime.timedelta(minutes=48),
-        'ofs_metadata': s111.S111Metadata('Port_of_New_York_and_New_Jersey', 'POM_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Port_of_New_York_and_New_Jersey', PRODUCT_DESCRIPTION_POM, PRODUCERCODE_US),
         'model_type': MODELTYPE_POM
     },
     'lmofs': {
@@ -188,7 +195,7 @@ MODELS = {
         'forecast_hours': list(range(0, 59)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Michigan', 'POM_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Lake_Michigan', PRODUCT_DESCRIPTION_POM, PRODUCERCODE_US),
         'model_type': MODELTYPE_POM
     },
     'lhofs': {
@@ -199,7 +206,7 @@ MODELS = {
         'forecast_hours': list(range(0, 59)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Huron', 'POM_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Lake_Huron', PRODUCT_DESCRIPTION_POM, PRODUCERCODE_US),
         'model_type': MODELTYPE_POM
     },
     'loofs': {
@@ -210,7 +217,7 @@ MODELS = {
         'forecast_hours': list(range(0, 59)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Ontario', 'POM_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Lake_Ontario', PRODUCT_DESCRIPTION_POM, PRODUCERCODE_US),
         'model_type': MODELTYPE_POM
     },
     'lsofs': {
@@ -221,7 +228,7 @@ MODELS = {
         'forecast_hours': list(range(0, 59)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Superior', 'POM_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Lake_Superior', PRODUCT_DESCRIPTION_POM, PRODUCERCODE_US),
         'model_type': MODELTYPE_POM
     },
     'rtofs': {
@@ -232,7 +239,7 @@ MODELS = {
         'forecast_hours': list(range(24, 96, 24)),
         'cycles': (0,),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Global_Ocean_Model', 'HYCOM_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('Global_Ocean_Model', PRODUCT_DESCRIPTION_HYCOM, PRODUCERCODE_US),
         'model_type': MODELTYPE_HYCOM
     },
     # Disable CIOFS support until wetting/drying handled properly by ROMS module
@@ -244,7 +251,7 @@ MODELS = {
     #    'forecast_hours': list(range(1, 49)),
     #    'cycles': (0, 6, 12, 18),
     #    'file_delay': datetime.timedelta(minutes=100),
-    #    'ofs_metadata': s111.S111Metadata('Cook_Inlet', 'ROMS_Hydrodynamic_Model_Forecasts', 'US'),
+    #    'ofs_metadata': s111.S111Metadata('Cook_Inlet', PRODUCT_DESCRIPTION_ROMS, PRODUCERCODE_US),
     #    'model_type': MODELTYPE_ROMS
     #},
     'wcofs': {
@@ -255,7 +262,7 @@ MODELS = {
         'forecast_hours': list(range(1, 21, 3)),
         'cycles': 3,
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('West_Coast', 'ROMS_Hydrodynamic_Model_Forecasts', 'US'),
+        'ofs_metadata': s111.S111Metadata('West_Coast', PRODUCT_DESCRIPTION_ROMS, PRODUCERCODE_US),
         'model_type': MODELTYPE_ROMS
     }
 }

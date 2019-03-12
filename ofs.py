@@ -41,6 +41,22 @@ MODELTYPE_HYCOM = 'hycom'
 MODELTYPE_POM = 'pom'
 MODELTYPE_ROMS = 'roms'
 
+# Model File classes associated with each model type
+MODEL_FILE_CLASS = {
+    MODELTYPE_FVCOM: fvcom.FVCOMFile,
+    MODELTYPE_HYCOM: hycom.HYCOMFile,
+    MODELTYPE_POM: pom.POMFile,
+    MODELTYPE_ROMS: roms.ROMSFile
+}
+
+# Index File classes associated with each model type
+MODEL_INDEX_CLASS = {
+    MODELTYPE_FVCOM: fvcom.FVCOMIndexFile,
+    MODELTYPE_HYCOM: hycom.HYCOMIndexFile,
+    MODELTYPE_POM: pom.POMIndexFile,
+    MODELTYPE_ROMS: roms.ROMSIndexFile
+}
+
 PRODUCT_DESCRIPTION_FVCOM = 'FVCOM_Hydrodynamic_Model_Forecasts'
 PRODUCT_DESCRIPTION_HYCOM = 'HYCOM_Hydrodynamic_Model_Forecasts'
 PRODUCT_DESCRIPTION_POM = 'POM_Hydrodynamic_Model_Forecasts'
@@ -370,11 +386,10 @@ def download(ofs_model, cycletime, download_dir):
     return local_files
 
 
-def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs_model, ofs_metadata, data_coding_format, target_depth):
+def download_and_process(download_dir, s111_dir, cycletime, ofs_model, ofs_metadata, data_coding_format, target_depth, index_file=None):
     """Download latest model run and convert to S-111 format.
 
     Args:
-        index_file_path: Path to NetCDF index file required for interpolation.
         s111_dir: Path to a parent directory where output S111 HDF5 file(s)
             will be generated. Must exist.
         cycletime: `datetime.datetime` representing model initialization
@@ -393,61 +408,56 @@ def download_and_process(index_file_path, download_dir, s111_dir, cycletime, ofs
         target_depth: The water current at a specified target depth below
             the sea surface in meters, default target depth is 4.5 meters,
             target interpolation depth must be greater or equal to 0.
+        index_file (`ModelIndexFile`, optional): The model index file to be
+            used for interpolation (if required), or `None` (default) if this
+            model requires no index file for processing.
     """
     local_files = download(ofs_model, cycletime, download_dir)
     print(download_dir)
 
     print('Converting files to S111 format...')
 
-    if data_coding_format == 2:
-        if MODELS[ofs_model]['model_type'] == MODELTYPE_FVCOM:
-            index_file = fvcom.FVCOMIndexFile(index_file_path)
-            model_output_files = []
-            for local_file in local_files:
-                model_output_files.append(fvcom.FVCOMFile(local_file))
-
-        elif MODELS[ofs_model]['model_type'] == MODELTYPE_ROMS:
-            index_file = roms.ROMSIndexFile(index_file_path)
-            model_output_files = []
-            for local_file in local_files:
-                model_output_files.append(roms.ROMSFile(local_file))
-
-        elif MODELS[ofs_model]['model_type'] == MODELTYPE_POM:
-            index_file = pom.POMIndexFile(index_file_path)
-            model_output_files = []
-            for local_file in local_files:
-                model_output_files.append(pom.POMFile(local_file))
-
-        elif MODELS[ofs_model]['model_type'] == MODELTYPE_HYCOM:
-            index_file = hycom.HYCOMIndexFile(index_file_path)
-            model_output_files = []
-            for local_file in local_files:
-                model_output_files.append(hycom.HYCOMFile(local_file))
-
-    elif data_coding_format == 3:
-        if MODELS[ofs_model]['model_type'] == MODELTYPE_FVCOM:
-            model_output_files = []
-            for local_file in local_files:
-                model_output_files.append(fvcom.FVCOMFile(local_file))
-
-        elif MODELS[ofs_model]['model_type'] == MODELTYPE_ROMS:
-            model_output_files = []
-            for local_file in local_files:
-                model_output_files.append(roms.ROMSFile(local_file))
-
-        elif MODELS[ofs_model]['model_type'] == MODELTYPE_POM:
-            model_output_files = []
-            for local_file in local_files:
-                model_output_files.append(pom.POMFile(local_file))
-
-        elif MODELS[ofs_model]['model_type'] == MODELTYPE_HYCOM:
-            model_output_files = []
-            for local_file in local_files:
-                model_output_files.append(hycom.HYCOMFile(local_file))
+    model_output_files = []
+    for local_file in local_files:
+        model_output_files.append(MODEL_FILE_CLASS[MODELS[ofs_model]['model_type']](local_file))
 
     s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata,
                          data_coding_format, target_depth)
 
+
+def create_index_file(index_file_path, model_file_path, model_type, model_name, target_cellsize_meters, grid_shp, grid_field_name, land_shp):
+    """
+    Create a model index file.
+
+    Args:
+        index_file_path: Path to index file to be created.
+        model_file_path: Path to model file required by index creation.
+        model_type: Model type designation (e.g. 'roms').
+        model_name: Name/abbreviation of modeling system (e.g. 'CBOFS').
+        target_cellsize_meters: Target cellsize (in meters) of grid definition.
+        grid_shp: Path to subgrid shapefile, if any (None otherwise).
+        grid_field_name: Name of grid field used for grid identifier, if
+            desired (None otherwise).
+        land_shp: Path to land/shoreline shapefile used during mask creation.
+
+    Returns:
+        True if successful; False if an exception was encountered.
+    """
+    index_file = MODEL_INDEX_CLASS[model_type](index_file_path)
+    model_output_file = MODEL_FILE_CLASS[model_type](model_file_path)
+
+    try:
+        index_file.open()
+        model_output_file.open()
+        index_file.init_nc(model_output_file, target_cellsize_meters, model_name,
+                           model_type, shoreline_shp=land_shp,
+                           subset_grid_shp=grid_shp, subset_grid_field_name=grid_field_name)
+        return True
+    finally:
+        index_file.close()
+        model_output_file.close()
+
+    return False
 
 def main():
     """Parse command line arguments and execute target functions."""
@@ -513,107 +523,54 @@ def main():
             parser.error('Specified land/shoreline shapefile does not exist [{}]'.format(args.land_shp))
             return 1
 
-        if MODELS[ofs_model]['model_type'] == MODELTYPE_FVCOM:
-            index_file = fvcom.FVCOMIndexFile(args.index_file_path)
-            model_output_file = fvcom.FVCOMFile(args.model_file_path[0])
-        elif MODELS[ofs_model]['model_type'] == MODELTYPE_ROMS:
-            index_file = roms.ROMSIndexFile(args.index_file_path)
-            model_output_file = roms.ROMSFile(args.model_file_path[0])
-        elif MODELS[ofs_model]['model_type'] == MODELTYPE_POM:
-            index_file = pom.POMIndexFile(args.index_file_path)
-            model_output_file = pom.POMFile(args.model_file_path[0])
-        elif MODELS[ofs_model]['model_type'] == MODELTYPE_HYCOM:
-            index_file = hycom.HYCOMIndexFile(args.index_file_path)
-            model_output_file = hycom.HYCOMFile(args.model_file_path[0])
+        return 0 if create_index_file(args.index_file_path,
+                                args.model_file_path[0],
+                                MODELS[ofs_model]['model_type'],
+                                args.ofs_model,
+                                args.target_cellsize_meters,
+                                args.grid_shp,
+                                args.grid_field_name,
+                                args.land_shp) else 1
 
-        try:
-            index_file.open()
-            model_output_file.open()
-            index_file.init_nc(model_output_file, int(args.target_cellsize_meters), args.ofs_model,
-                               MODELS[ofs_model]['model_type'], shoreline_shp=args.land_shp,
-                               subset_grid_shp=args.grid_shp, subset_grid_field_name=args.grid_field_name)
-        finally:
-            index_file.close()
-            model_output_file.close()
-
-    elif not os.path.isdir(args.s111_dir):
+    if not os.path.isdir(args.s111_dir):
         parser.error('Invalid/missing S-111 output directory (-s/-s111_dir) specified.')
         return 1
-    elif data_coding_format == 2:
+
+    s111_dir = args.s111_dir
+    if not s111_dir.endswith('/'):
+        s111_dir += '/'
+    s111_dir += ofs_model.lower()
+    if not os.path.isdir(s111_dir):
+        os.makedirs(s111_dir)
+
+    if data_coding_format == 2:
         if not os.path.exists(args.index_file_path):
             parser.error('Specified index file does not exist [{}]'.format(args.index_file_path))
             return 1
-        s111_dir = args.s111_dir
-        if not s111_dir.endswith('/'):
-            s111_dir += '/'
-        s111_dir += ofs_model.lower()
-        if not os.path.isdir(s111_dir):
-            os.makedirs(s111_dir)
-
-        if args.model_file_path is not None:
-            if args.cycletime is None:
-                print(parser.error('A valid -c/--cycletime matching the input model forecast, must be specified, format must be YYYYMMDD.'))
-                return 1
-
-            if MODELS[ofs_model]['model_type'] == MODELTYPE_FVCOM:
-                index_file = fvcom.FVCOMIndexFile(args.index_file_path)
-                model_output_file = fvcom.FVCOMFile(args.model_file_path[0])
-            elif MODELS[ofs_model]['model_type'] == MODELTYPE_ROMS:
-                index_file = roms.ROMSIndexFile(args.index_file_path)
-                model_output_file = roms.ROMSFile(args.model_file_path[0])
-            elif MODELS[ofs_model]['model_type'] == MODELTYPE_POM:
-                index_file = pom.POMIndexFile(args.index_file_path)
-                model_output_file = pom.POMFile(args.model_file_path[0])
-            elif MODELS[ofs_model]['model_type'] == MODELTYPE_HYCOM:
-                index_file = hycom.HYCOMIndexFile(args.index_file_path)
-                model_output_file = hycom.HYCOMFile(args.model_file_path[0])
-
-            s111.convert_to_s111(index_file, [model_output_file], s111_dir, cycletime, ofs_model,
-                                 MODELS[ofs_model]['ofs_metadata'], data_coding_format, target_depth)
-
-        else:
-            if not args.download_dir or not os.path.isdir(args.download_dir):
-                parser.error('Invalid/missing download directory (-d/--download_dir) specified.')
-                return 1
-
-            download_and_process(args.index_file_path, args.download_dir, s111_dir, cycletime, ofs_model,
-                                 MODELS[ofs_model]['ofs_metadata'], data_coding_format, target_depth)
-
+        index_file = MODEL_INDEX_CLASS[MODELS[ofs_model]['model_type']](args.index_file_path)
     elif data_coding_format == 3:
-        s111_dir = args.s111_dir
-        if not s111_dir.endswith('/'):
-            s111_dir += '/'
-        s111_dir += ofs_model.lower()
-        if not os.path.isdir(s111_dir):
-            os.makedirs(s111_dir)
+        index_file = None
 
-        if args.model_file_path is not None:
-            if args.cycletime is None:
-                print(parser.error(
-                    'A valid -c/--cycletime matching the input model forecast, must be specified, format must be YYYYMMDD.'))
-                return 1
+    if args.model_file_path is not None:
+        if args.cycletime is None:
+            print(parser.error('A valid -c/--cycletime matching the input model forecast, must be specified, format must be YYYYMMDD.'))
+            return 1
 
-            if MODELS[ofs_model]['model_type'] == MODELTYPE_FVCOM:
-                model_output_file = fvcom.FVCOMFile(args.model_file_path[0])
-            elif MODELS[ofs_model]['model_type'] == MODELTYPE_ROMS:
-                model_output_file = roms.ROMSFile(args.model_file_path[0])
-            elif MODELS[ofs_model]['model_type'] == MODELTYPE_POM:
-                model_output_file = pom.POMFile(args.model_file_path[0])
-            elif MODELS[ofs_model]['model_type'] == MODELTYPE_HYCOM:
-                model_output_file = hycom.HYCOMFile(args.model_file_path[0])
+        model_output_file = MODEL_FILE_CLASS[MODELS[ofs_model]['model_type']](args.model_file_path[0])
 
-            index_file = None
-            s111.convert_to_s111(index_file, [model_output_file], s111_dir, cycletime, ofs_model,
-                                 MODELS[ofs_model]['ofs_metadata'], data_coding_format, target_depth)
+        s111.convert_to_s111(index_file, [model_output_file],
+                             s111_dir, cycletime, ofs_model,
+                             MODELS[ofs_model]['ofs_metadata'],
+                             data_coding_format, target_depth)
 
-        else:
-            if not args.download_dir or not os.path.isdir(args.download_dir):
-                parser.error('Invalid/missing download directory (-d/--download_dir) specified.')
-                return 1
+    else:
+        if not args.download_dir or not os.path.isdir(args.download_dir):
+            parser.error('Invalid/missing download directory (-d/--download_dir) specified.')
+            return 1
 
-            index_file = None
-            download_and_process(index_file, args.download_dir, s111_dir, cycletime, ofs_model,
-                                 MODELS[ofs_model]['ofs_metadata'], data_coding_format, target_depth)
+        download_and_process(args.download_dir, s111_dir, cycletime, ofs_model,
+                             MODELS[ofs_model]['ofs_metadata'],
+                             data_coding_format, target_depth, index_file)
 
     return 0
 

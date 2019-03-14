@@ -45,6 +45,9 @@ MODEL_INDEX_FILE = {
     }
 }
 
+# Process Regular Grids
+DATA_CODING_FORMAT=2
+
 
 def run_ofs(ofs_model):
     cycletime = ofs.get_latest_cycletime(ofs_model)
@@ -70,10 +73,10 @@ def run_ofs(ofs_model):
         model_output_files.append(ofs.MODEL_FILE_CLASS[ofs.MODELS[ofs_model]['model_type']](local_file))
 
     # Call default grid processing
-    workers.append(workerPool.apply_async(s111.convert_to_s111, (index_file_default, model_output_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]['ofs_metadata'], None)))
+    workers.append(workerPool.apply_async(s111.convert_to_s111, (index_file_default, model_output_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]['ofs_metadata'], DATA_CODING_FORMAT, None)))
 
     # Call subgrid processing
-    workers.append(workerPool.apply_async(s111.convert_to_s111, (index_file_subset, model_output_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]['ofs_metadata'], None)))
+    workers.append(workerPool.apply_async(s111.convert_to_s111, (index_file_subset, model_output_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]['ofs_metadata'], DATA_CODING_FORMAT, None)))
 
     s111_file_paths = []
     for w in workers:

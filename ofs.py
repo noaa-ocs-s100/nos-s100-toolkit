@@ -474,7 +474,7 @@ def main():
     parser.add_argument('-c', '--cycletime', help='Model cycle time (i.e. initialization/reference time) to process, in the format YYYYMMDDHH. If not specified, the most recent cycle will be calculated using configured thresholds and present system time.')
     parser.add_argument('-t', '--target_cellsize_meters', help='Target cellsize of regular grid cells in meters. Actual size of x/y grid cells will vary slightly, since the regular grid uses lat/lon coordinates (thus a cell\'s width/height in meters will vary by latitude), and since it will be adjusted in order to fit a whole number of grid cells in the x and y directions within the calculated grid extent.')
     parser.add_argument('-z', '--target_depth', help='The water current at a specified target depth below the sea surface in meters, default target depth is 4.5 meters. Target interpolation depth must be greater or equal to 0.')
-    parser.add_argument('-code', '--data_coding_format', help='Data format type, 1 - time series fixed station, 2 - regular grid, 3 - ungeorectified grid, 4 - time series moving platform.')
+    parser.add_argument('-code', '--data_coding_format', help='Data format type, 1 - Time series fixed station, 2 - Regular grid, 3 - Ungeorectified grid, 4 - Time series moving platform.', required=True)
     args = parser.parse_args()
 
     ofs_model = args.ofs_model
@@ -491,6 +491,10 @@ def main():
             return 1
 
     data_coding_format = int(args.data_coding_format)
+
+    if data_coding_format not in (1, 2, 3, 4):
+        parser.error('Invalid data coding format type specified. Supported values: 1 - Time series fixed station, 2 - Regular grid, 3 - Ungeorectified grid, 4 - Time series moving platform')
+        return 1
 
     cycletime = args.cycletime
     if cycletime is not None:

@@ -63,10 +63,13 @@ PRODUCT_DESCRIPTION_POM = 'POM_Hydrodynamic_Model_Forecasts'
 PRODUCT_DESCRIPTION_ROMS = 'ROMS_Hydrodynamic_Model_Forecasts'
 
 PRODUCERCODE_US = 'US'
+CURRENT_DATATYPE = 6
 
 """
 Model configuration dictionary, where key is the lower-case model identifier
 and value is another dictionary with the following properties:
+    file_server: NCEP NOMADS or CO-OPS THREDDS
+    file_path: NCEP NOMADS or CO-OPS THREDDS file path
     forecast_hours: List of forecast projections (hours from cycle time at
         which each forecast is valid).
     cycles: List of hour-of-day values corresponding with daily model cycles
@@ -74,7 +77,8 @@ and value is another dictionary with the following properties:
         1200, and 1800 UTC, specify (0,6,12,18).
     file_delay: `datetime.timedelta` representing delay (time since model cycle
         time) of file availability on HTTP server.
-    ofs_metadata: OFS region and product
+    region: OFS region
+    product: Description of product type
     model_type: Type of underlining modelling framework.
 """
 MODELS = {
@@ -86,7 +90,8 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=85),
-        'ofs_metadata': s111.S111Metadata('Chesapeake_Bay', PRODUCT_DESCRIPTION_ROMS, PRODUCERCODE_US),
+        'region': 'Chesapeake_Bay',
+        'product': PRODUCT_DESCRIPTION_ROMS,
         'model_type': MODELTYPE_ROMS
 
     },
@@ -98,7 +103,8 @@ MODELS = {
         'forecast_hours': list(range(3, 73, 3)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=134),
-        'ofs_metadata': s111.S111Metadata('Gulf_of_Maine', PRODUCT_DESCRIPTION_ROMS, PRODUCERCODE_US),
+        'region': 'Gulf_of_Maine',
+        'product': PRODUCT_DESCRIPTION_ROMS,
         'model_type': MODELTYPE_ROMS
 
     },
@@ -110,7 +116,8 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=80),
-        'ofs_metadata': s111.S111Metadata('Delaware_Bay', PRODUCT_DESCRIPTION_ROMS, PRODUCERCODE_US),
+        'region': 'Delaware_Bay',
+        'product': PRODUCT_DESCRIPTION_ROMS,
         'model_type': MODELTYPE_ROMS
 
     },
@@ -122,7 +129,8 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=74),
-        'ofs_metadata': s111.S111Metadata('Tampa_Bay', PRODUCT_DESCRIPTION_ROMS, PRODUCERCODE_US),
+        'region': 'Tampa_Bay',
+        'product': PRODUCT_DESCRIPTION_ROMS,
         'model_type': MODELTYPE_ROMS
 
     },
@@ -134,7 +142,8 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=95),
-        'ofs_metadata': s111.S111Metadata('Northeast_Gulf_of_Mexico', PRODUCT_DESCRIPTION_FVCOM, PRODUCERCODE_US),
+        'region': 'Northeast_Gulf_of_Mexico',
+        'product': PRODUCT_DESCRIPTION_FVCOM,
         'model_type': MODELTYPE_FVCOM
     },
     'nwgofs': {
@@ -145,7 +154,8 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=90),
-        'ofs_metadata': s111.S111Metadata('Northwest_Gulf_of_Mexico', PRODUCT_DESCRIPTION_FVCOM, PRODUCERCODE_US),
+        'region': 'Northwest_Gulf_of_Mexico',
+        'product': PRODUCT_DESCRIPTION_FVCOM,
         'model_type': MODELTYPE_FVCOM
     },
     'ngofs': {
@@ -156,7 +166,8 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=50),
-        'ofs_metadata': s111.S111Metadata('Northern_Gulf_of_Mexico', PRODUCT_DESCRIPTION_FVCOM, PRODUCERCODE_US),
+        'region': 'Northern_Gulf_of_Mexico',
+        'product': PRODUCT_DESCRIPTION_FVCOM,
         'model_type': MODELTYPE_FVCOM
     },
     'sfbofs': {
@@ -167,7 +178,8 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
         'file_delay': datetime.timedelta(minutes=55),
-        'ofs_metadata': s111.S111Metadata('San_Francisco_Bay', PRODUCT_DESCRIPTION_FVCOM, PRODUCERCODE_US),
+        'region': 'San_Francisco_Bay',
+        'product': PRODUCT_DESCRIPTION_FVCOM,
         'model_type': MODELTYPE_FVCOM
     },
     'leofs': {
@@ -178,7 +190,8 @@ MODELS = {
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Erie', PRODUCT_DESCRIPTION_FVCOM, PRODUCERCODE_US),
+        'region': 'Lake_Erie',
+        'product': PRODUCT_DESCRIPTION_FVCOM,
         'model_type': MODELTYPE_FVCOM
     },
     'nyofs': {
@@ -189,7 +202,8 @@ MODELS = {
         'forecast_hours': list(range(0, 53)),
         'cycles': (5, 11, 17, 23),
         'file_delay': datetime.timedelta(minutes=48),
-        'ofs_metadata': s111.S111Metadata('Port_of_New_York_and_New_Jersey', PRODUCT_DESCRIPTION_POM, PRODUCERCODE_US),
+        'region': 'Port_of_New_York_and_New_Jersey',
+        'product': PRODUCT_DESCRIPTION_POM,
         'model_type': MODELTYPE_POM
     },
     'nyofs_fg': {
@@ -200,7 +214,8 @@ MODELS = {
         'forecast_hours': list(range(0, 53)),
         'cycles': (5, 11, 17, 23),
         'file_delay': datetime.timedelta(minutes=48),
-        'ofs_metadata': s111.S111Metadata('Port_of_New_York_and_New_Jersey', PRODUCT_DESCRIPTION_POM, PRODUCERCODE_US),
+        'region': 'Port_of_New_York_and_New_Jersey',
+        'product': PRODUCT_DESCRIPTION_POM,
         'model_type': MODELTYPE_POM
     },
     'lmofs': {
@@ -211,7 +226,8 @@ MODELS = {
         'forecast_hours': list(range(0, 59)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Michigan', PRODUCT_DESCRIPTION_POM, PRODUCERCODE_US),
+        'region': 'Lake_Michigan',
+        'product': PRODUCT_DESCRIPTION_POM,
         'model_type': MODELTYPE_POM
     },
     'lhofs': {
@@ -222,7 +238,8 @@ MODELS = {
         'forecast_hours': list(range(0, 59)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Huron', PRODUCT_DESCRIPTION_POM, PRODUCERCODE_US),
+        'region': 'Lake_Huron',
+        'product': PRODUCT_DESCRIPTION_POM,
         'model_type': MODELTYPE_POM
     },
     'loofs': {
@@ -233,7 +250,8 @@ MODELS = {
         'forecast_hours': list(range(0, 59)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Ontario', PRODUCT_DESCRIPTION_POM, PRODUCERCODE_US),
+        'region': 'Lake_Ontario',
+        'product': PRODUCT_DESCRIPTION_POM,
         'model_type': MODELTYPE_POM
     },
     'lsofs': {
@@ -244,7 +262,8 @@ MODELS = {
         'forecast_hours': list(range(0, 59)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Lake_Superior', PRODUCT_DESCRIPTION_POM, PRODUCERCODE_US),
+        'region': 'Lake_Superior',
+        'product': PRODUCT_DESCRIPTION_POM,
         'model_type': MODELTYPE_POM
     },
     'rtofs': {
@@ -255,21 +274,10 @@ MODELS = {
         'forecast_hours': list(range(24, 96, 24)),
         'cycles': (0,),
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('Global_Ocean_Model', PRODUCT_DESCRIPTION_HYCOM, PRODUCERCODE_US),
+        'region': 'Global_Ocean_Model',
+        'product': PRODUCT_DESCRIPTION_HYCOM,
         'model_type': MODELTYPE_HYCOM
     },
-    # Disable CIOFS support until wetting/drying handled properly by ROMS module
-    #'ciofs': {
-    #    # Hourly output from +1 to +49
-    #    'file_server': HTTP_SERVER_THREDDS,
-    #    'file_path': HTTP_NETCDF_THREDDS_PATH_FORMAT,
-    #    'file_name': LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
-    #    'forecast_hours': list(range(1, 49)),
-    #    'cycles': (0, 6, 12, 18),
-    #    'file_delay': datetime.timedelta(minutes=100),
-    #    'ofs_metadata': s111.S111Metadata('Cook_Inlet', PRODUCT_DESCRIPTION_ROMS, PRODUCERCODE_US),
-    #    'model_type': MODELTYPE_ROMS
-    #},
     'wcofs': {
         # Hourly output from +1 to +21
         'file_server': HTTP_SERVER_THREDDS,
@@ -278,9 +286,23 @@ MODELS = {
         'forecast_hours': list(range(1, 21, 3)),
         'cycles': 3,
         'file_delay': datetime.timedelta(minutes=100),
-        'ofs_metadata': s111.S111Metadata('West_Coast', PRODUCT_DESCRIPTION_ROMS, PRODUCERCODE_US),
+        'region': 'West_Coast',
+        'product': PRODUCT_DESCRIPTION_ROMS,
         'model_type': MODELTYPE_ROMS
     }
+    # Disable CIOFS support until wetting/drying handled properly by ROMS module
+    # 'ciofs': {
+    #    # Hourly output from +1 to +49
+    #    'file_server': HTTP_SERVER_THREDDS,
+    #    'file_path': HTTP_NETCDF_THREDDS_PATH_FORMAT,
+    #    'file_name': LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
+    #    'forecast_hours': list(range(1, 49)),
+    #    'cycles': (0, 6, 12, 18),
+    #    'file_delay': datetime.timedelta(minutes=100),
+    #    'region': 'Cook_Inlet',
+    #    'product': PRODUCT_DESCRIPTION_ROMS,
+    #    'model_type': MODELTYPE_ROMS
+    # },
 }
 
 
@@ -386,7 +408,7 @@ def download(ofs_model, cycletime, download_dir):
     return local_files
 
 
-def download_and_process(download_dir, s111_dir, cycletime, ofs_model, ofs_metadata, data_coding_format, target_depth, index_file=None):
+def download_and_process(download_dir, s111_dir, cycletime, file_metadata, data_coding_format, index_file=None):
     """Download latest model run and convert to S-111 format.
 
     Args:
@@ -399,30 +421,25 @@ def download_and_process(download_dir, s111_dir, cycletime, ofs_model, ofs_metad
             subdirectory named according to the model identifier (will be
             created if it does not yet exist; if it does exist, existing files
             will be removed before downloading new files).
-        ofs_model: The target model identifier.
-        ofs_metadata: `S111Metadata` instance describing metadata for geographic
+        file_metadata: `S111Metadata` instance describing metadata for geographic
             identifier and description of current meter type, forecast method,
             or model.
         data_coding_format: 1:Time series at fixed stations, 2:Regularly gridded arrays,
             3:Ungeorectified gridded arrays, 4:Time series for one moving platform.
-        target_depth: The water current at a specified target depth below
-            the sea surface in meters, default target depth is 4.5 meters,
-            target interpolation depth must be greater or equal to 0.
         index_file (`ModelIndexFile`, optional): The model index file to be
             used for interpolation (if required), or `None` (default) if this
             model requires no index file for processing.
     """
-    local_files = download(ofs_model, cycletime, download_dir)
+    local_files = download(MODELS['ofs_model'], cycletime, download_dir)
     print(download_dir)
 
     print('Converting files to S111 format...')
 
     model_output_files = []
     for local_file in local_files:
-        model_output_files.append(MODEL_FILE_CLASS[MODELS[ofs_model]['model_type']](local_file))
+        model_output_files.append(MODEL_FILE_CLASS[MODELS['ofs_model']['model_type']](local_file))
 
-    s111.convert_to_s111(index_file, model_output_files, s111_dir, cycletime, ofs_model, ofs_metadata,
-                         data_coding_format, target_depth)
+    s111.model_to_s111(index_file, model_output_files, s111_dir, cycletime, file_metadata, data_coding_format)
 
 
 def create_index_file(index_file_path, model_file_path, model_type, model_name, target_cellsize_meters, grid_shp, grid_field_name, land_shp):
@@ -458,6 +475,7 @@ def create_index_file(index_file_path, model_file_path, model_type, model_name, 
         model_output_file.close()
 
     return False
+
 
 def main():
     """Parse command line arguments and execute target functions."""
@@ -562,19 +580,20 @@ def main():
 
         model_output_file = MODEL_FILE_CLASS[MODELS[ofs_model]['model_type']](args.model_file_path[0])
 
-        s111.convert_to_s111(index_file, [model_output_file],
-                             s111_dir, cycletime, ofs_model,
-                             MODELS[ofs_model]['ofs_metadata'],
-                             data_coding_format, target_depth)
+        file_metadata = s111.S111Metadata(MODELS[ofs_model]['region'], MODELS[ofs_model]['product'], CURRENT_DATATYPE,
+                                          PRODUCERCODE_US, target_depth, None, ofs_model)
+
+        s111.model_to_s111(index_file, [model_output_file], s111_dir, cycletime, file_metadata, data_coding_format)
 
     else:
         if not args.download_dir or not os.path.isdir(args.download_dir):
             parser.error('Invalid/missing download directory (-d/--download_dir) specified.')
             return 1
 
-        download_and_process(args.download_dir, s111_dir, cycletime, ofs_model,
-                             MODELS[ofs_model]['ofs_metadata'],
-                             data_coding_format, target_depth, index_file)
+        file_metadata = s111.S111Metadata(MODELS[ofs_model]['region'], MODELS[ofs_model]['product'], CURRENT_DATATYPE,
+                                          PRODUCERCODE_US, target_depth, None, ofs_model)
+
+        download_and_process(args.download_dir, s111_dir, cycletime, file_metadata, data_coding_format, index_file)
 
     return 0
 

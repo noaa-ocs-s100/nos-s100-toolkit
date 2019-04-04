@@ -13,6 +13,7 @@ from thyme.model import roms
 from thyme.model import fvcom
 from thyme.model import pom
 from thyme.model import hycom
+from thyme.util import dateutil
 
 # Base URL of NCEP NOMADS HTTP for accessing CO-OPS OFS NetCDF files
 HTTP_SERVER_NOMADS = 'https://nomads.ncep.noaa.gov'
@@ -92,7 +93,8 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=85),
         'region': 'Chesapeake_Bay',
         'product': PRODUCT_DESCRIPTION_ROMS,
-        'model_type': MODELTYPE_ROMS
+        'model_type': MODELTYPE_ROMS,
+        'datetime_rounding': None
 
     },
     'gomofs': {
@@ -105,7 +107,8 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=134),
         'region': 'Gulf_of_Maine',
         'product': PRODUCT_DESCRIPTION_ROMS,
-        'model_type': MODELTYPE_ROMS
+        'model_type': MODELTYPE_ROMS,
+        'datetime_rounding': None
 
     },
     'dbofs': {
@@ -118,7 +121,8 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=80),
         'region': 'Delaware_Bay',
         'product': PRODUCT_DESCRIPTION_ROMS,
-        'model_type': MODELTYPE_ROMS
+        'model_type': MODELTYPE_ROMS,
+        'datetime_rounding': None
 
     },
     'tbofs': {
@@ -131,7 +135,8 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=74),
         'region': 'Tampa_Bay',
         'product': PRODUCT_DESCRIPTION_ROMS,
-        'model_type': MODELTYPE_ROMS
+        'model_type': MODELTYPE_ROMS,
+        'datetime_rounding': None
 
     },
     'negofs': {
@@ -144,7 +149,9 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=95),
         'region': 'Northeast_Gulf_of_Mexico',
         'product': PRODUCT_DESCRIPTION_FVCOM,
-        'model_type': MODELTYPE_FVCOM
+        'model_type': MODELTYPE_FVCOM,
+        'datetime_rounding': dateutil.DatetimeRounding.NEAREST_HOUR
+
     },
     'nwgofs': {
         # Hourly output from +1 to +48
@@ -156,7 +163,9 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=90),
         'region': 'Northwest_Gulf_of_Mexico',
         'product': PRODUCT_DESCRIPTION_FVCOM,
-        'model_type': MODELTYPE_FVCOM
+        'model_type': MODELTYPE_FVCOM,
+        'datetime_rounding': dateutil.DatetimeRounding.NEAREST_HOUR
+
     },
     'ngofs': {
         # Hourly output from +1 to +48
@@ -168,7 +177,9 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=50),
         'region': 'Northern_Gulf_of_Mexico',
         'product': PRODUCT_DESCRIPTION_FVCOM,
-        'model_type': MODELTYPE_FVCOM
+        'model_type': MODELTYPE_FVCOM,
+        'datetime_rounding': dateutil.DatetimeRounding.NEAREST_HOUR
+
     },
     'sfbofs': {
         # Hourly output from +1 to +48
@@ -180,7 +191,9 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=55),
         'region': 'San_Francisco_Bay',
         'product': PRODUCT_DESCRIPTION_FVCOM,
-        'model_type': MODELTYPE_FVCOM
+        'model_type': MODELTYPE_FVCOM,
+        'datetime_rounding': dateutil.DatetimeRounding.NEAREST_HOUR
+
     },
     'leofs': {
         # Hourly output from +1 to +48
@@ -192,7 +205,9 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Erie',
         'product': PRODUCT_DESCRIPTION_FVCOM,
-        'model_type': MODELTYPE_FVCOM
+        'model_type': MODELTYPE_FVCOM,
+        'datetime_rounding': dateutil.DatetimeRounding.NEAREST_HOUR
+
     },
     'nyofs': {
         # Hourly output from +1 to +53
@@ -204,7 +219,9 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=48),
         'region': 'Port_of_New_York_and_New_Jersey',
         'product': PRODUCT_DESCRIPTION_POM,
-        'model_type': MODELTYPE_POM
+        'model_type': MODELTYPE_POM,
+        'datetime_rounding': dateutil.DatetimeRounding.NEAREST_HOUR
+
     },
     'nyofs_fg': {
         # Hourly output from +1 to +53
@@ -216,7 +233,9 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=48),
         'region': 'Port_of_New_York_and_New_Jersey',
         'product': PRODUCT_DESCRIPTION_POM,
-        'model_type': MODELTYPE_POM
+        'model_type': MODELTYPE_POM,
+        'datetime_rounding': dateutil.DatetimeRounding.NEAREST_HOUR
+
     },
     'lmofs': {
         # Hourly output from +1 to +59
@@ -228,7 +247,9 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Michigan',
         'product': PRODUCT_DESCRIPTION_POM,
-        'model_type': MODELTYPE_POM
+        'model_type': MODELTYPE_POM,
+        'datetime_rounding': dateutil.DatetimeRounding.NEAREST_HOUR
+
     },
     'lhofs': {
         # Hourly output from +1 to +59
@@ -240,7 +261,9 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Huron',
         'product': PRODUCT_DESCRIPTION_POM,
-        'model_type': MODELTYPE_POM
+        'model_type': MODELTYPE_POM,
+        'datetime_rounding': dateutil.DatetimeRounding.NEAREST_HOUR
+
     },
     'loofs': {
         # Hourly output from +1 to +59
@@ -252,7 +275,9 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Ontario',
         'product': PRODUCT_DESCRIPTION_POM,
-        'model_type': MODELTYPE_POM
+        'model_type': MODELTYPE_POM,
+        'datetime_rounding': dateutil.DatetimeRounding.NEAREST_HOUR
+
     },
     'lsofs': {
         # Hourly output from +1 to +59
@@ -264,7 +289,9 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Superior',
         'product': PRODUCT_DESCRIPTION_POM,
-        'model_type': MODELTYPE_POM
+        'model_type': MODELTYPE_POM,
+        'datetime_rounding': dateutil.DatetimeRounding.NEAREST_HOUR
+
     },
     'rtofs': {
         # Hourly output from +24 to +72
@@ -276,7 +303,9 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=100),
         'region': 'Global_Ocean_Model',
         'product': PRODUCT_DESCRIPTION_HYCOM,
-        'model_type': MODELTYPE_HYCOM
+        'model_type': MODELTYPE_HYCOM,
+        'datetime_rounding': None
+
     },
     'wcofs': {
         # Hourly output from +1 to +21
@@ -288,7 +317,9 @@ MODELS = {
         'file_delay': datetime.timedelta(minutes=100),
         'region': 'West_Coast',
         'product': PRODUCT_DESCRIPTION_ROMS,
-        'model_type': MODELTYPE_ROMS
+        'model_type': MODELTYPE_ROMS,
+        'datetime_rounding': None
+
     }
     # Disable CIOFS support until wetting/drying handled properly by ROMS module
     # 'ciofs': {
@@ -301,7 +332,8 @@ MODELS = {
     #    'file_delay': datetime.timedelta(minutes=100),
     #    'region': 'Cook_Inlet',
     #    'product': PRODUCT_DESCRIPTION_ROMS,
-    #    'model_type': MODELTYPE_ROMS
+    #    'model_type': MODELTYPE_ROMS,
+    #    'datetime_rounding': None
     # },
 }
 
@@ -408,7 +440,7 @@ def download(ofs_model, cycletime, download_dir):
     return local_files
 
 
-def download_and_process(download_dir, s111_dir, cycletime, file_metadata, data_coding_format, index_file=None):
+def download_and_process(download_dir, s111_dir, cycletime, ofs_model, file_metadata, data_coding_format, index_file=None):
     """Download latest model run and convert to S-111 format.
 
     Args:
@@ -421,6 +453,7 @@ def download_and_process(download_dir, s111_dir, cycletime, file_metadata, data_
             subdirectory named according to the model identifier (will be
             created if it does not yet exist; if it does exist, existing files
             will be removed before downloading new files).
+        ofs_model: Ocean forecast system model identifier.
         file_metadata: `S111Metadata` instance describing metadata for geographic
             identifier and description of current meter type, forecast method,
             or model.
@@ -430,14 +463,13 @@ def download_and_process(download_dir, s111_dir, cycletime, file_metadata, data_
             used for interpolation (if required), or `None` (default) if this
             model requires no index file for processing.
     """
-    local_files = download(MODELS['ofs_model'], cycletime, download_dir)
+    local_files = download(ofs_model, cycletime, download_dir)
     print(download_dir)
-
     print('Converting files to S111 format...')
 
     model_output_files = []
     for local_file in local_files:
-        model_output_files.append(MODEL_FILE_CLASS[MODELS['ofs_model']['model_type']](local_file))
+        model_output_files.append(MODEL_FILE_CLASS[MODELS[ofs_model]['model_type']](local_file, datetime_rounding=MODELS[ofs_model]['datetime_rounding']))
 
     s111.model_to_s111(index_file, model_output_files, s111_dir, cycletime, file_metadata, data_coding_format)
 
@@ -466,7 +498,7 @@ def create_index_file(index_file_path, model_file_path, model_type, model_name, 
     try:
         index_file.open()
         model_output_file.open()
-        index_file.init_nc(model_output_file, target_cellsize_meters, model_name,
+        index_file.init_nc(model_output_file, int(target_cellsize_meters), model_name,
                            model_type, shoreline_shp=land_shp,
                            subset_grid_shp=grid_shp, subset_grid_field_name=grid_field_name)
         return True
@@ -569,7 +601,9 @@ def main():
         if not os.path.exists(args.index_file_path):
             parser.error('Specified index file does not exist [{}]'.format(args.index_file_path))
             return 1
+
         index_file = MODEL_INDEX_CLASS[MODELS[ofs_model]['model_type']](args.index_file_path)
+
     elif data_coding_format == 3:
         index_file = None
 
@@ -578,7 +612,9 @@ def main():
             print(parser.error('A valid -c/--cycletime matching the input model forecast, must be specified, format must be YYYYMMDD.'))
             return 1
 
-        model_output_file = MODEL_FILE_CLASS[MODELS[ofs_model]['model_type']](args.model_file_path[0])
+        model_output_file = MODEL_FILE_CLASS[MODELS[ofs_model]['model_type']](args.model_file_path[0],
+                                                                              datetime_rounding=MODELS[ofs_model][
+                                                                                  'datetime_rounding'])
 
         file_metadata = s111.S111Metadata(MODELS[ofs_model]['region'], MODELS[ofs_model]['product'], CURRENT_DATATYPE,
                                           PRODUCERCODE_US, target_depth, None, ofs_model)
@@ -593,7 +629,7 @@ def main():
         file_metadata = s111.S111Metadata(MODELS[ofs_model]['region'], MODELS[ofs_model]['product'], CURRENT_DATATYPE,
                                           PRODUCERCODE_US, target_depth, None, ofs_model)
 
-        download_and_process(args.download_dir, s111_dir, cycletime, file_metadata, data_coding_format, index_file)
+        download_and_process(args.download_dir, s111_dir, cycletime, ofs_model, file_metadata, data_coding_format, index_file)
 
     return 0
 

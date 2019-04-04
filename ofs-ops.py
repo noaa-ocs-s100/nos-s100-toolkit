@@ -13,11 +13,6 @@ from glob import glob
 import argparse
 
 from s100py import s111
-from thyme.model import roms
-from thyme.model import fvcom
-from thyme.model import pom
-from thyme.model import hycom
-
 import ofs
 
 # Max number of subprocess workers to spin up
@@ -46,7 +41,8 @@ MODEL_INDEX_FILE = {
 }
 
 # Process Regular Grids
-DATA_CODING_FORMAT=2
+DATA_CODING_FORMAT = 2
+TARGET_DEPTH = 4.5
 
 
 def run_ofs(ofs_model):
@@ -66,19 +62,26 @@ def run_ofs(ofs_model):
 
     model_output_files = []
 
-
     index_file_default = ofs.MODEL_INDEX_CLASS[ofs.MODELS[ofs_model]['model_type']](index_default_path)
     index_file_subset = ofs.MODEL_INDEX_CLASS[ofs.MODELS[ofs_model]['model_type']](index_subset_path)
+
     for local_file in local_files:
-        model_output_files.append(ofs.MODEL_FILE_CLASS[ofs.MODELS[ofs_model]['model_type']](local_file))
+        model_output_files.append(ofs.MODEL_FILE_CLASS[ofs.MODELS[ofs_model]['model_type']](local_file,
+                                                                                            datetime_rounding=
+                                                                                            ofs.MODELS[ofs_model][
+                                                                                                'datetime_rounding']))
+
+    file_metadata = s111.S111Metadata(ofs.MODELS[ofs_model]['region'], ofs.MODELS[ofs_model]['product'],
+                                      ofs.CURRENT_DATATYPE, ofs.PRODUCERCODE_US, TARGET_DEPTH, None, ofs_model)
 
     # Call default grid processing
-    workers.append(workerPool.apply_async(s111.convert_to_s111, (index_file_default, model_output_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]['ofs_metadata'], DATA_CODING_FORMAT, None)))
+    workers.append(workerPool.apply_async(s111.model_to_s111, (index_file_default, model_output_files, s111_dir, cycletime, file_metadata, DATA_CODING_FORMAT)))
 
     # Call subgrid processing
-    workers.append(workerPool.apply_async(s111.convert_to_s111, (index_file_subset, model_output_files, s111_dir, cycletime, ofs_model, ofs.MODELS[ofs_model]['ofs_metadata'], DATA_CODING_FORMAT, None)))
+    workers.append(workerPool.apply_async(s111.model_to_s111, (index_file_subset, model_output_files, s111_dir, cycletime, file_metadata, DATA_CODING_FORMAT)))
 
     s111_file_paths = []
+
     for w in workers:
         s111_file_paths.extend(w.get())
 
@@ -104,6 +107,7 @@ def main():
         parser.error(
             'A valid -o/--ofs_model must be specified. Possible values: {}'.format(', '.join(list(MODEL_INDEX_FILE.keys()))))
         return 1
+
     ofs_model = ofs_model.lower()
 
     run_ofs(ofs_model)

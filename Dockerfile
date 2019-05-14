@@ -65,17 +65,19 @@ RUN set -ex; \
     echo "Removing build dependency packages" \
       && apk --no-cache del --purge -r build_deps;
 
-# Python prerequisites
+# GDAL & Python prerequisites
 RUN set -ex; \
     echo "Installing required system packages" \
-      # geos required by shapely
+      # geos required by shapely & gdal
       # lapack required for numpy/scipy
-      && apk --no-cache add --virtual=py_deps geos lapack; \
+      && apk --no-cache add --virtual=gdal_deps geos proj4 zlib \
+      && apk --no-cache add --virtual=py_deps lapack; \
     \
     echo "Installing build dependency packages" \
       && apk --no-cache add --virtual=build_deps \
-          gcc g++ make m4 musl-dev \
-          gfortran lapack-dev geos-dev \
+          gcc g++ make m4 musl-dev cmake linux-headers \
+          zlib-dev minizip-dev expat-dev uriparser-dev \
+          gfortran lapack-dev geos-dev proj4-dev \
           openssl ca-certificates; \
     \
     echo "Upgrading pip" \
@@ -84,7 +86,27 @@ RUN set -ex; \
     echo "Installing python dependencies" \
       # numpy must be installed first (separately) or scipy install won't work.
       && pip install --no-cache-dir numpy \
-      && pip install --no-cache-dir shapely scipy netCDF4; \
+      && pip install --no-cache-dir shapely scipy netCDF4 h5py; \
+    \
+    echo "Downloading GDAL source code" \
+      && gdal_archive=gdal-${GDAL_VERSION}.tar.gz \
+      && gdal_src_dir=gdal-${GDAL_VERSION} \
+      && wget -q -O ${gdal_archive} "https://github.com/OSGeo/gdal/archive/v${GDAL_VERSION}.tar.gz" \
+      && tar xf ${gdal_archive} \
+      && echo "Compiling/installing GDAL" \
+      && cd ${gdal_src_dir}/gdal \
+      && ./configure --prefix=$GDAL_PREFIX \
+          #--with-libkml \
+          --with-geos=/usr/bin/geos-config \
+          --with-proj=/usr \
+          --with-netcdf=$NETCDF_PREFIX \
+          --with-hdf5=$HDF5_PREFIX \
+          --with-python=yes \
+      && make \
+      && make install \
+      && cd ../.. \
+      && rm ${gdal_archive} \
+      && rm -r ${gdal_src_dir}; \
     \
     echo "Removing build dependency packages" \
       && apk --no-cache del --purge -r build_deps;

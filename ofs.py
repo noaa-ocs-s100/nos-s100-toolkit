@@ -25,7 +25,8 @@ HTTP_SERVER_THREDDS = 'https://opendap.co-ops.nos.noaa.gov'
 # 'f012') will be injected by using str.format().
 # Example: reftime.strftime(HTTP_NETCDF_PATH_FORMAT).format(forecast_str='f012')
 HTTP_NETCDF_NOMADS_PATH_FORMAT = '/pub/data/nccf/com/nos/prod/{model_str_lc}.%Y%m%d/nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc'
-HTTP_NETCDF_NOMADS_RTOFS_PATH_FORMAT = '/pub/data/nccf/com/{model_str_lc}/prod/{model_str_lc}.%Y%m%d/{model_str_lc}_glo_3dz_{forecast_str}_6hrly_hvr_US_east.nc'
+HTTP_NETCDF_NOMADS_RTOFS_EAST_PATH_FORMAT = '/pub/data/nccf/com/{model_str_lc}/prod/{model_str_lc}.%Y%m%d/{model_str_lc}_glo_3dz_{forecast_str}_6hrly_hvr_US_east.nc'
+HTTP_NETCDF_NOMADS_RTOFS_WEST_PATH_FORMAT = '/pub/data/nccf/com/{model_str_lc}/prod/{model_str_lc}.%Y%m%d/{model_str_lc}_glo_3dz_{forecast_str}_6hrly_hvr_US_west.nc'
 HTTP_NETCDF_THREDDS_PATH_FORMAT = '/thredds/fileServer/NOAA/{model_str_uc}/MODELS/%Y%m/nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc'
 HTTP_NETCDF_THREDDS_NYOFS_PATH_FORMAT = '/thredds/fileServer/NOAA/{model_str_uc}/MODELS/%Y%m/nos.{model_str_lc}.fields.forecast.%Y%m%d.t%Hz.nc'
 HTTP_NETCDF_THREDDS_GLOFS_PATH_FORMAT = '/thredds/fileServer/NOAA/{model_str_uc}/MODELS/%Y%m/glofs.{model_str_lc}.fields.forecast.%Y%m%d.t%Hz.nc'
@@ -35,7 +36,8 @@ LOCAL_NETCDF_NOMADS_FILENAME_FORMAT = 'nos.{model_str_lc}.fields.{forecast_str}.
 LOCAL_NETCDF_THREDDS_FILENAME_FORMAT = 'nos.{model_str_lc}.fields.{forecast_str}.%Y%m%d.t%Hz.nc'
 LOCAL_NETCDF_THREDDS_NYOFS_FILENAME_FORMAT = 'nos.{model_str_lc}.fields.%Y%m%d.t%Hz.nc'
 LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT = 'glofs.{model_str_lc}.fields.%Y%m%d.t%Hz.nc'
-LOCAL_NETCDF_OCS_RTOFS_FILENAME_FORMAT = '{model_str_lc}_glo_3dz_{forecast_str}_6hrly_hvr_US_east.nc'
+LOCAL_NETCDF_OCS_RTOFS_WEST_FILENAME_FORMAT = '{model_str_lc}_glo_3dz_{forecast_str}_6hrly_hvr_US_west.nc'
+LOCAL_NETCDF_OCS_RTOFS_EAST_FILENAME_FORMAT = '{model_str_lc}_glo_3dz_{forecast_str}_6hrly_hvr_US_east.nc'
 
 MODELTYPE_FVCOM = 'fvcom'
 MODELTYPE_HYCOM = 'hycom'
@@ -242,7 +244,7 @@ MODELS = {
         'file_server': HTTP_SERVER_THREDDS,
         'file_path': HTTP_NETCDF_THREDDS_GLOFS_PATH_FORMAT,
         'file_name': LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT,
-        'forecast_hours': list(range(0, 59)),
+        'forecast_hours': list(range(0, 1)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Michigan',
@@ -256,7 +258,7 @@ MODELS = {
         'file_server': HTTP_SERVER_THREDDS,
         'file_path': HTTP_NETCDF_THREDDS_GLOFS_PATH_FORMAT,
         'file_name': LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT,
-        'forecast_hours': list(range(0, 59)),
+        'forecast_hours': list(range(0, 1)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Huron',
@@ -270,7 +272,7 @@ MODELS = {
         'file_server': HTTP_SERVER_THREDDS,
         'file_path': HTTP_NETCDF_THREDDS_GLOFS_PATH_FORMAT,
         'file_name': LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT,
-        'forecast_hours': list(range(0, 59)),
+        'forecast_hours': list(range(0, 1)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Ontario',
@@ -284,7 +286,7 @@ MODELS = {
         'file_server': HTTP_SERVER_THREDDS,
         'file_path': HTTP_NETCDF_THREDDS_GLOFS_PATH_FORMAT,
         'file_name': LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT,
-        'forecast_hours': list(range(0, 59)),
+        'forecast_hours': list(range(0, 1)),
         'cycles': (0, 6, 12, 18),
         'file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Superior',
@@ -293,15 +295,29 @@ MODELS = {
         'datetime_rounding': dateutil.DatetimeRounding.NEAREST_HOUR
 
     },
-    'rtofs': {
+    'rtofs_east': {
         # Hourly output from +24 to +72
         'file_server': HTTP_SERVER_NOMADS,
-        'file_path': HTTP_NETCDF_NOMADS_RTOFS_PATH_FORMAT,
-        'file_name': LOCAL_NETCDF_OCS_RTOFS_FILENAME_FORMAT,
+        'file_path': HTTP_NETCDF_NOMADS_RTOFS_EAST_PATH_FORMAT,
+        'file_name': LOCAL_NETCDF_OCS_RTOFS_EAST_FILENAME_FORMAT,
         'forecast_hours': list(range(24, 96, 24)),
         'cycles': (0,),
         'file_delay': datetime.timedelta(minutes=100),
-        'region': 'Global_Ocean_Model',
+        'region': 'US East',
+        'product': PRODUCT_DESCRIPTION_HYCOM,
+        'model_type': MODELTYPE_HYCOM,
+        'datetime_rounding': None
+
+    },
+    'rtofs_west': {
+        # Hourly output from +24 to +72
+        'file_server': HTTP_SERVER_NOMADS,
+        'file_path': HTTP_NETCDF_NOMADS_RTOFS_WEST_PATH_FORMAT,
+        'file_name': LOCAL_NETCDF_OCS_RTOFS_WEST_FILENAME_FORMAT,
+        'forecast_hours': list(range(24, 96, 24)),
+        'cycles': (0,),
+        'file_delay': datetime.timedelta(minutes=100),
+        'region': 'US West',
         'product': PRODUCT_DESCRIPTION_HYCOM,
         'model_type': MODELTYPE_HYCOM,
         'datetime_rounding': None
@@ -319,6 +335,20 @@ MODELS = {
         'product': PRODUCT_DESCRIPTION_ROMS,
         'model_type': MODELTYPE_ROMS,
         'datetime_rounding': None
+
+    },
+    'lmhofs': {
+        # Hourly output from +1 to +121
+        'file_server': HTTP_SERVER_THREDDS,
+        'file_path': HTTP_NETCDF_THREDDS_PATH_FORMAT,
+        'file_name': LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
+        'forecast_hours': list(range(1, 121)),
+        'cycles': (0, 6, 12, 18),
+        'file_delay': datetime.timedelta(minutes=100),
+        'region': 'Lake Michigan & Lake Huron',
+        'product': PRODUCT_DESCRIPTION_FVCOM,
+        'model_type': MODELTYPE_FVCOM,
+        'datetime_rounding': dateutil.DatetimeRounding.NEAREST_HOUR
 
     }
     # Disable CIOFS support until wetting/drying handled properly by ROMS module
@@ -408,34 +438,62 @@ def download(ofs_model, cycletime, download_dir):
     if MODELS[ofs_model]['file_server'] == HTTP_SERVER_NOMADS:
         for forecast in MODELS[ofs_model]['forecast_hours']:
             forecast_str = 'f{0:03d}'.format(forecast)
-            url = cycletime.strftime('{}{}'.format(MODELS[ofs_model]['file_server'], MODELS[ofs_model]['file_path'])).format(
-                model_str_lc=ofs_model.lower(), forecast_str=forecast_str)
-            local_file = '{}/{}'.format(download_dir, cycletime.strftime(MODELS[ofs_model]['file_name']).format(
-                model_str_lc=ofs_model.lower(), forecast_str=forecast_str))
+            if ofs_model == 'rtofs_east' or ofs_model == 'rtofs_west':
+                url = cycletime.strftime('{}{}'.format(MODELS[ofs_model]['file_server'], MODELS[ofs_model]['file_path'])).format(
+                    model_str_lc='rtofs', forecast_str=forecast_str)
+                local_file = '{}/{}'.format(download_dir, cycletime.strftime(MODELS[ofs_model]['file_name']).format(
+                    model_str_lc='rtofs', forecast_str=forecast_str))
+
+                print('Downloading {} to {}...'.format(url, local_file))
+                with urllib.request.urlopen(url) as response, open(local_file, 'wb') as out_file:
+                    shutil.copyfileobj(response, out_file)
+                print('Download successful.')
+                local_files.append(local_file)
+
+            else:
+                url = cycletime.strftime('{}{}'.format(MODELS[ofs_model]['file_server'], MODELS[ofs_model]['file_path'])).format(
+                    model_str_lc=ofs_model.lower(), forecast_str=forecast_str)
+                local_file = '{}/{}'.format(download_dir, cycletime.strftime(MODELS[ofs_model]['file_name']).format(
+                    model_str_lc=ofs_model.lower(), forecast_str=forecast_str))
+
+                print('Downloading {} to {}...'.format(url, local_file))
+                with urllib.request.urlopen(url) as response, open(local_file, 'wb') as out_file:
+                    shutil.copyfileobj(response, out_file)
+                print('Download successful.')
+                local_files.append(local_file)
+
+    elif MODELS[ofs_model]['file_server'] == HTTP_SERVER_THREDDS:
+        if ofs_model == 'nyofs_fg':
+            url = cycletime.strftime('{}{}'.format(MODELS[ofs_model]['file_server'], MODELS[ofs_model]['file_path'])).format(model_str_uc='NYOFS', model_str_lc=ofs_model.lower())
+            local_file = '{}/{}'.format(download_dir, cycletime.strftime(MODELS[ofs_model]['file_name']).format(model_str_lc=ofs_model.lower()))
+
             print('Downloading {} to {}...'.format(url, local_file))
             with urllib.request.urlopen(url) as response, open(local_file, 'wb') as out_file:
                 shutil.copyfileobj(response, out_file)
             print('Download successful.')
             local_files.append(local_file)
 
-    elif MODELS[ofs_model]['file_server'] == HTTP_SERVER_THREDDS:
-        if ofs_model == 'nyofs_fg':
-            url = cycletime.strftime('{}{}'.format(MODELS[ofs_model]['file_server'], MODELS[ofs_model]['file_path'])).format(model_str_uc='NYOFS', model_str_lc=ofs_model.lower())
-            local_file = '{}/{}'.format(download_dir, cycletime.strftime(MODELS[ofs_model]['file_name']).format(model_str_lc=ofs_model.lower()))
         elif ofs_model == 'nyofs':
             url = cycletime.strftime('{}{}'.format(MODELS[ofs_model]['file_server'], MODELS[ofs_model]['file_path'])).format(model_str_uc=ofs_model.upper(), model_str_lc=ofs_model.lower())
             local_file = '{}/{}'.format(download_dir, cycletime.strftime(MODELS[ofs_model]['file_name']).format(model_str_lc=ofs_model.lower()))
+
+            print('Downloading {} to {}...'.format(url, local_file))
+            with urllib.request.urlopen(url) as response, open(local_file, 'wb') as out_file:
+                shutil.copyfileobj(response, out_file)
+            print('Download successful.')
+            local_files.append(local_file)
+
         else:
             for forecast in MODELS[ofs_model]['forecast_hours']:
                 forecast_str = 'f{0:03d}'.format(forecast)
                 url = cycletime.strftime('{}{}'.format(MODELS[ofs_model]['file_server'], MODELS[ofs_model]['file_path'])).format(model_str_uc=ofs_model.upper(), model_str_lc=ofs_model.lower(), forecast_str=forecast_str)
                 local_file = '{}/{}'.format(download_dir, cycletime.strftime(MODELS[ofs_model]['file_name']).format(model_str_lc=ofs_model.lower(), forecast_str=forecast_str))
 
-        print('Downloading {} to {}...'.format(url, local_file))
-        with urllib.request.urlopen(url) as response, open(local_file, 'wb') as out_file:
-            shutil.copyfileobj(response, out_file)
-        print('Download successful.')
-        local_files.append(local_file)
+                print('Downloading {} to {}...'.format(url, local_file))
+                with urllib.request.urlopen(url) as response, open(local_file, 'wb') as out_file:
+                    shutil.copyfileobj(response, out_file)
+                print('Download successful.')
+                local_files.append(local_file)
 
     return local_files
 

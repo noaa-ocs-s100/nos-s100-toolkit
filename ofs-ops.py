@@ -23,20 +23,24 @@ DEST_PATH = '/win/ofsdata/%Y%m%d/HDF5/S111_1.0.0/'
 
 MODEL_INDEX_FILE = {
     'cbofs': {
-        'index_default_path': '{}indexes/v0.8.0/cbofs_index_default_500m.nc'.format(SOURCE_PATH),
-        'index_subset_path': '{}indexes/v0.8.0/cbofs_index_band4v4_500m.nc'.format(SOURCE_PATH)
+        'index_default_path': '{}indexes/v0.9.0/cbofs_index_default_500m.nc'.format(SOURCE_PATH),
+        'index_subset_path': '{}indexes/v0.9.0/cbofs_index_band4v5_500m.nc'.format(SOURCE_PATH)
     },
     'dbofs': {
-        'index_default_path': '{}indexes/v0.8.0/dbofs_index_default_500m.nc'.format(SOURCE_PATH),
-        'index_subset_path': '{}indexes/v0.8.0/dbofs_index_band4v4_500m.nc'.format(SOURCE_PATH)
+        'index_default_path': '{}indexes/v0.9.0/dbofs_index_default_500m.nc'.format(SOURCE_PATH),
+        'index_subset_path': '{}indexes/v0.9.0/dbofs_index_band4v5_500m.nc'.format(SOURCE_PATH)
     },
     'nyofs': {
-        'index_default_path': '{}indexes/v0.8.0/nyofs_index_default_500m.nc'.format(SOURCE_PATH),
-        'index_subset_path': '{}indexes/v0.8.0/nyofs_index_band4v4_500m.nc'.format(SOURCE_PATH)
+        'index_default_path': '{}indexes/v0.9.0/nyofs_index_default_500m.nc'.format(SOURCE_PATH),
+        'index_subset_path': '{}indexes/v0.9.0/nyofs_index_band4v5_500m.nc'.format(SOURCE_PATH)
     },
-    'rtofs': {
-        'index_default_path': '{}indexes/v0.8.0/rtofs_index_us_east_8500m.nc'.format(SOURCE_PATH),
-        'index_subset_path': '{}indexes/v0.8.0/rtofs_index_band2v4_8500m.nc'.format(SOURCE_PATH)
+    'rtofs_east': {
+        'index_default_path': '{}indexes/v0.9.0/rtofs_east_index_default_8500m.nc'.format(SOURCE_PATH),
+        'index_subset_path': '{}indexes/v0.9.0/rtofs_east_index_band2v5_8500m.nc'.format(SOURCE_PATH)
+    },
+    'rtofs_west': {
+        'index_default_path': '{}indexes/v0.9.0/rtofs_west_index_default_8500m.nc'.format(SOURCE_PATH),
+        'index_subset_path': '{}indexes/v0.9.0/rtofs_west_index_band2v5_8500m.nc'.format(SOURCE_PATH)
     }
 }
 

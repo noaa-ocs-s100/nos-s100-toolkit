@@ -556,8 +556,7 @@ def create_index_file(index_file_path, model_file_path, model_type, model_name, 
     try:
         index_file.open()
         model_output_file.open()
-        index_file.init_nc(model_output_file, int(target_cellsize_meters), model_name,
-                           model_type, shoreline_shp=land_shp,
+        index_file.init_nc(model_output_file, int(target_cellsize_meters), model_name, shoreline_shp=land_shp,
                            subset_grid_shp=grid_shp, subset_grid_field_name=grid_field_name)
         return True
     finally:

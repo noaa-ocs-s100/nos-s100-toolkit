@@ -40,12 +40,14 @@ For information about the model index files used by these scripts, see the
 Supported Models
 ================
 These scripts presently support the following hydrodynamic modeling systems:
+
 - NCEP Real-Time Ocean Forecast System (RTOFS)
 - NOS Chesapeake Bay Operational Forecast System (CBOFS)
 - NOS Delaware Bay Operational Forecast System (DBOFS)
 - NOS Gulf of Maine Operational Forecast System (GoMOFS)
 - NOS Lake Erie Operational Forecast System (LEOFS)
 - NOS Lake Huron Operational Forecast System (LHOFS)
+- NOS Lake Michigan & Huron Operational Forecast System (LMHOFS)
 - NOS Lake Michigan Operational Forecast System (LMOFS)
 - NOS Lake Ontario Operational Forecast System (LOOFS)
 - NOS Lake Superior Operational Forecast System (LSOFS)

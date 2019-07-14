@@ -155,6 +155,8 @@ Execution
   environment name s111ofs onto your system command prompt)
 
     - ``conda activate nos-s100``
+    - ``pip install git+https://github.com/noaa-ocs-modeling/thyme.git``
+    - ``pip install git+https://github.com/noaa-ocs-s100/s100py.git``
 
 - To print detailed usage information:
 
@@ -228,7 +230,6 @@ Execution
       format
 
         - ``python ofs.py -s ~/nos-s100-toolkit/hdf5 -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -c 2019070100 -code 3``
-
 
 Authors
 =======

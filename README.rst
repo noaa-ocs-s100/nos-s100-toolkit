@@ -163,73 +163,84 @@ Execution
     - ``cd ~/nos-s100-toolkit/src``
     - ``python ofs.py -h``
 
-- For more information about S-111 data coding formats, see the
+- The following examples describe the steps to create different S-111 data
+  coding formats. For more information about S-111 data coding formats, see the
   `s100py <https://github.com/noaa-ocs-s100/s100py>`_ documentation.
 
-**To create S-111 files (Code 2)**
 
-- Generate an index file for a particular model at a particular resolution,
-  use the following steps:
+**To create regular-grid S-111 files (Coding Format 2)**
 
-    *Note: Keep in mind that larger model domains and higher resolutions will take longer to generate.*
 
-  .. code-block:: bash
+- Generate an index (grid definition) file for a particular model at a
+  particular resolution:
 
-    - Download any model output NetCDF file and place in the `netcdf` subdirectory,
-      e.g.:
-
-        - ``cd ~/nos-s100-toolkit/netcdf``
-        - ``wget https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/CBOFS/MODELS/201907/nos.cbofs.fields.f001.20190701.t00z.nc``
-          (modify the model names, forecast hour and timestamp as necessary)
-
-    - Download any land shapefile and/or subgrid shapefile, unzip and place in the `shp` subdirectory,
-      e.g.:
-
-        - ``cd ~/nos-s100-toolkit/shp``
-        - ``wget https://www.weather.gov/source/gis/Shapefiles/County/s_11au16.zip`` # U.S. States and Territories
-
-    - Using the downloaded NetCDF file and subgrid/shoreline shapefiles,
-      generate a "default grid" or "subgrid" index file.
-
-        - Create a "default grid" index NetCDF file (a single grid matching the
-          envelope of the target OFS) for CBOFS with a target cellsize of 500
-          meters, requires a shoreline shapefile
-
-            - ``python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_default_500m.nc -b -l ~/nos-s100-toolkit/shp/s_11au16.shp -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -t 500 -code 2``
-
-        - Create a "subgrid" index NetCDF file, requires an orthogonal grid shapefile,
-          if using another grid shapefile, alter shapefile name and field name below
-          (matching the envelope of any subgrid polygons from the supplied shapefile
-          which intersect with the model domain and contains each subgrids spatial extent,
-          id and name if specified)
-
-            - ``python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_subset_500m.nc -b -l ~/nos-s100-toolkit/shp/land.shp -g ~/nos-s100-toolkit/shp/grid.shp -f GridCellName -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -t 500 -code 2``
-
-- If you already have a NetCDF index file for the target model:
+    *Note: Keep in mind that larger model domains and higher resolutions will
+    take longer to generate.*
 
   .. code-block:: bash
 
-    - To download and convert the latest full OFS forecast run to S-111 format
+    
+    # Download a model output NetCDF file and place in the `netcdf`
+    # subdirectory, modifying the model abbreviation, timestamp, and forecast
+    # hour as necessary
+    cd ~/nos-s100-toolkit/netcdf
+    wget https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/CBOFS/MODELS/201907/nos.cbofs.fields.f001.20190701.t00z.nc
 
-        - ``python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_default_500m.nc -s ~/nos-s100-toolkit/hdf5 -d ~/nos-s100-toolkit/netcdf -o cbofs -code 2``
+    # Download any land shapefile and/or subgrid shapefile, unzip and place in
+    # the `shp` subdirectory
+    cd ~/nos-s100-toolkit/shp
+    wget https://www.weather.gov/source/gis/Shapefiles/County/s_11au16.zip # U.S. States and Territories
 
-    - To skip the download and convert existing OFS forecast file to S-111
-      format
+    # Using the downloaded NetCDF file and subgrid/shoreline shapefiles,
+    # generate a "default grid" index file. The extent (envelope) of the
+    # resulting grid definition will match the model's native domain.
+    # Specifying `-t 500` implies a target cellsize of ~500 meters.
+    python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_default_500m.nc -b -l ~/nos-s100-toolkit/shp/s_11au16.shp -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -t 500 -code 2
 
-        - ``python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_default_500m.nc -s ~/nos-s100-toolkit/hdf5 -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -c 2019070100 -code 2``
+    # Alternatively, create a "subgrid" index file instead. This requires a
+    # shapefile containing orthogonal grid polygons describing areas for which
+    # distinct S-111 files will be generated (for all grid polygons that
+    # intersect the native model domain). Specifying `-f GridCellName`
+    # indicates that values from the supplied shapefile's "GridCellname"
+    # attribute should be used in the filename of any generated S-111 files. If
+    # not specified, the primary key identifier (e.g. `fid`) will be used
+    # instead to distinguish the S-111 files from each other.
+    python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_subset_500m.nc -b -l ~/nos-s100-toolkit/shp/land.shp -g ~/nos-s100-toolkit/shp/grid.shp -f GridCellName -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -t 500 -code 2``
 
-**To create S-111 files (Code 3)**
+
+- Download the latest full OFS forecast run and convert to S-111 format
+  (requires specifying a NetCDF index [grid definition] file):
 
   .. code-block:: bash
 
-    - To download and convert the latest full OFS forecast run to S-111 format
+    python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_default_500m.nc -s ~/nos-s100-toolkit/hdf5 -d ~/nos-s100-toolkit/netcdf -o cbofs -code 2
 
-        - ``python ofs.py -s ~/nos-s100-toolkit/hdf5 -d ~/nos-s100-toolkit/netcdf -o cbofs -code 3``
 
-    - To skip the download and convert existing OFS forecast file to S-111
-      format
+- Skip the download step and convert an existing OFS forecast file to S-111
+  format
 
-        - ``python ofs.py -s ~/nos-s100-toolkit/hdf5 -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -c 2019070100 -code 3``
+  .. code-block:: bash
+
+    python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_default_500m.nc -s ~/nos-s100-toolkit/hdf5 -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -c 2019070100 -code 2
+
+
+**To create "ungeorectified gridded array" S-111 files (Coding Format 3)**
+
+
+- Download the latest full OFS forecast run and convert to S-111 format:
+
+  .. code-block:: bash
+
+    python ofs.py -s ~/nos-s100-toolkit/hdf5 -d ~/nos-s100-toolkit/netcdf -o cbofs -code 3
+
+
+- Skip the download step and convert an existing OFS forecast file to S-111
+  format
+
+  .. code-block:: bash
+
+    python ofs.py -s ~/nos-s100-toolkit/hdf5 -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -c 2019070100 -code 3
+
 
 Authors
 =======

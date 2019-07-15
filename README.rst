@@ -152,7 +152,7 @@ Execution
 =========
 
 - Activate your new conda environment (once activated, conda prepends the
-  environment name s111ofs onto your system command prompt)
+  environment name nos-s100 onto your system command prompt)
 
     - ``conda activate nos-s100``
     - ``pip install git+https://github.com/noaa-ocs-modeling/thyme.git``
@@ -201,11 +201,11 @@ Execution
     # shapefile containing orthogonal grid polygons describing areas for which
     # distinct S-111 files will be generated (for all grid polygons that
     # intersect the native model domain). Specifying `-f GridCellName`
-    # indicates that values from the supplied shapefile's "GridCellname"
-    # attribute should be used in the filename of any generated S-111 files. If
+    # indicates the values from the supplied shapefile's "GridCellname"
+    # attribute to be used for the filename of any generated S-111 files. If
     # not specified, the primary key identifier (e.g. `fid`) will be used
     # instead to distinguish the S-111 files from each other.
-    python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_subset_500m.nc -b -l ~/nos-s100-toolkit/shp/land.shp -g ~/nos-s100-toolkit/shp/grid.shp -f GridCellName -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -t 500 -code 2``
+    python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_subset_500m.nc -b -l ~/nos-s100-toolkit/shp/land.shp -g ~/nos-s100-toolkit/shp/grid.shp -f GridCellName -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -t 500 -code 2
 
 
 - Download the latest full OFS forecast run and convert to S-111 format

@@ -175,7 +175,7 @@ Execution
     > *Note: Keep in mind that larger model domains and higher
     > resolutions will take longer to generate.*
 
-    ``` {.bash}
+    ```bash
     # Download a model output NetCDF file and place in the `netcdf`
     # subdirectory, modifying the model abbreviation, timestamp, and forecast
     # hour as necessary
@@ -208,31 +208,30 @@ Execution
     format (requires specifying a NetCDF index \[grid definition\]
     file):
 
-    ``` {.bash}
+    ```bash
     python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_default_500m.nc -s ~/nos-s100-toolkit/hdf5 -d ~/nos-s100-toolkit/netcdf -o cbofs -code 2
     ```
 
 -   Skip the download step and convert an existing OFS forecast file to
     S-111 format
 
-    ``` {.bash}
+    ```bash
     python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_default_500m.nc -s ~/nos-s100-toolkit/hdf5 -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -c 2019070100 -code 2
     ```
 
-**To create \"ungeorectified gridded array\" S-111 files (Coding Format
-3)**
+**To create \"ungeorectified gridded array\" S-111 files (Coding Format 3)**
 
 -   Download the latest full OFS forecast run and convert to S-111
     format:
 
-    ``` {.bash}
+    ```bash
     python ofs.py -s ~/nos-s100-toolkit/hdf5 -d ~/nos-s100-toolkit/netcdf -o cbofs -code 3
     ```
 
 -   Skip the download step and convert an existing OFS forecast file to
     S-111 format
 
-    ``` {.bash}
+    ```bash
     python ofs.py -s ~/nos-s100-toolkit/hdf5 -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -c 2019070100 -code 3
     ```
 

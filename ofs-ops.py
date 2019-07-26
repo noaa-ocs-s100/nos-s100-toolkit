@@ -76,13 +76,13 @@ def run_ofs(ofs_model):
                                                                                                 'datetime_rounding']))
 
     file_metadata = s111.S111Metadata(ofs.MODELS[ofs_model]['region'], ofs.MODELS[ofs_model]['product'],
-                                      ofs.CURRENT_DATATYPE, ofs.PRODUCERCODE_US, TARGET_DEPTH, None, ofs_model)
+                                      ofs.CURRENT_DATATYPE, ofs.PRODUCERCODE_US, None, ofs_model)
 
     # Call default grid processing
-    workers.append(workerPool.apply_async(s111.model_to_s111, (index_file_default, model_output_files, s111_dir, cycletime, file_metadata, DATA_CODING_FORMAT)))
+    workers.append(workerPool.apply_async(s111.model_to_s111, (index_file_default, model_output_files, s111_dir, cycletime, file_metadata, DATA_CODING_FORMAT, TARGET_DEPTH)))
 
     # Call subgrid processing
-    workers.append(workerPool.apply_async(s111.model_to_s111, (index_file_subset, model_output_files, s111_dir, cycletime, file_metadata, DATA_CODING_FORMAT)))
+    workers.append(workerPool.apply_async(s111.model_to_s111, (index_file_subset, model_output_files, s111_dir, cycletime, file_metadata, DATA_CODING_FORMAT, TARGET_DEPTH)))
 
     s111_file_paths = []
 

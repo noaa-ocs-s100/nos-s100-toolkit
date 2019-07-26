@@ -498,7 +498,7 @@ def download(ofs_model, cycletime, download_dir):
     return local_files
 
 
-def download_and_process(download_dir, s111_dir, cycletime, ofs_model, file_metadata, data_coding_format, index_file=None):
+def download_and_process(download_dir, s111_dir, cycletime, ofs_model, file_metadata, data_coding_format, target_depth, index_file=None):
     """Download latest model run and convert to S-111 format.
 
     Args:
@@ -520,6 +520,8 @@ def download_and_process(download_dir, s111_dir, cycletime, ofs_model, file_meta
         index_file (`ModelIndexFile`, optional): The model index file to be
             used for interpolation (if required), or `None` (default) if this
             model requires no index file for processing.
+        target_depth: The water current at a specified target depth below the sea
+            surface in meters.
     """
     local_files = download(ofs_model, cycletime, download_dir)
     print(download_dir)
@@ -529,7 +531,7 @@ def download_and_process(download_dir, s111_dir, cycletime, ofs_model, file_meta
     for local_file in local_files:
         model_output_files.append(MODEL_FILE_CLASS[MODELS[ofs_model]['model_type']](local_file, datetime_rounding=MODELS[ofs_model]['datetime_rounding']))
 
-    s111.model_to_s111(index_file, model_output_files, s111_dir, cycletime, file_metadata, data_coding_format)
+    s111.model_to_s111(index_file, model_output_files, s111_dir, cycletime, file_metadata, data_coding_format, target_depth)
 
 
 def create_index_file(index_file_path, model_file_path, model_type, model_name, target_cellsize_meters, grid_shp, grid_field_name, land_shp):
@@ -674,9 +676,9 @@ def main():
                                                                                   'datetime_rounding'])
 
         file_metadata = s111.S111Metadata(MODELS[ofs_model]['region'], MODELS[ofs_model]['product'], CURRENT_DATATYPE,
-                                          PRODUCERCODE_US, target_depth, None, ofs_model)
+                                          PRODUCERCODE_US, None, ofs_model)
 
-        s111.model_to_s111(index_file, [model_output_file], s111_dir, cycletime, file_metadata, data_coding_format)
+        s111.model_to_s111(index_file, [model_output_file], s111_dir, cycletime, file_metadata, data_coding_format, target_depth)
 
     else:
         if not args.download_dir or not os.path.isdir(args.download_dir):
@@ -684,9 +686,9 @@ def main():
             return 1
 
         file_metadata = s111.S111Metadata(MODELS[ofs_model]['region'], MODELS[ofs_model]['product'], CURRENT_DATATYPE,
-                                          PRODUCERCODE_US, target_depth, None, ofs_model)
+                                          PRODUCERCODE_US, None, ofs_model)
 
-        download_and_process(args.download_dir, s111_dir, cycletime, ofs_model, file_metadata, data_coding_format, index_file)
+        download_and_process(args.download_dir, s111_dir, cycletime, ofs_model, file_metadata, data_coding_format, target_depth, index_file)
 
     return 0
 

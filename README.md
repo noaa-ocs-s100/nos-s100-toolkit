@@ -11,7 +11,7 @@ Overview
 
 These scripts download NOS Ocean Model NetCDF Forecast files hosted on
 the NOAA Operational Model Archive and Distribution System
-([NOMADS](ftp://ftp.ncep.noaa.gov/pub/data/nccf/com/nos/prod/)) and on
+[NOMADS](ftp://ftp.ncep.noaa.gov/pub/data/nccf/com/nos/prod/) and on
 the NOAA CO-OPS
 [THREDDS](https://opendap.co-ops.nos.noaa.gov/thredds/catalog.html) Data
 Server and use the [thyme](https://github.com/noaa-ocs-modeling/thyme)
@@ -78,19 +78,15 @@ This codebase relies on the following Python packages:
 -   [s100py](https://github.com/noaa-ocs-s100/s100py)
 -   [thyme](https://github.com/noaa-ocs-modeling/thyme)
 
-However, the above packages rely on a number of additional packages that
-must be installed first, including `h5py`, `netCDF4`, `numpy`, `scipy`,
-`gdal`, and `shapely`.
-
-Instructions for installing these prerequisites can be found on the
-project pages linked above, however a preconfigured conda environment
-file is provided in this repository that can be used to install all
-dependencies quickly. To go this route, you must first install
-Miniconda.
+However, the above packages rely on the GDAL Python bindings to be
+present, so it usually can\'t just be installed using `pip install gdal`.
+We recommend installing GDAL either through a package manager (e.g.
+`conda`, `apt`, `yum`, `pacman`) or by using the preconfigured conda
+environment file provided in this repository that can be used to install
+all dependencies quickly. To go this route, you must first install Miniconda.
 
 For instructions downloading/installing Miniconda, please reference the
-[official
-documentation](https://docs.conda.io/en/latest/miniconda.html).
+[official documentation](https://docs.conda.io/en/latest/miniconda.html).
 
 Instructions for configuring your conda environment can be found in the
 following sections.
@@ -105,63 +101,84 @@ Configuration
     be checked out and run. For simplicity, this example assumes that
     directory is under the user\'s home directory.
 
-    > -   `mkdir ~/nos-s100-toolkit`
-    > -   `cd ~/nos-s100-toolkit`
+```bash
+    mkdir ~/nos-s100-toolkit
+    cd ~/nos-s100-toolkit
+```
 
 -   Create a subdirectory that will store the NetCDF index files
 
-    > -   `mkdir ~/nos-s100-toolkit/indexes`
-    > -   Copy existing index files, if any, to this directory
+```bash
+    mkdir ~/nos-s100-toolkit/indexes
+```
+
+-   Copy existing index files, if any, to this directory
 
 -   Create a subdirectory that will store downloaded model NetCDF files
 
-    > -   `mkdir ~/nos-s100-toolkit/netcdf`
+```bash
+    mkdir ~/nos-s100-toolkit/netcdf
+```
 
 -   Create a subdirectory that will store generated S-111 HDF5 output
     files
 
-    > -   `mkdir ~/nos-s100-toolkit/hdf5`
+```bash
+    mkdir ~/nos-s100-toolkit/hdf5
+```
 
 -   Create a subdirectory that will store shoreline and/or subgrid
     shapefiles. This is only required when generating new NetCDF index
     files. Make sure that any shapefiles being used have coverage for
     the model domain(s) you will be working with.
 
-    > -   `mkdir ~/nos-s100-toolkit/shp`
-    > -   Copy the shapefiles, if any, to this directory.
+```bash
+   mkdir ~/nos-s100-toolkit/shp
+```
+
+-   Copy the shapefiles, if any, to this directory.
 
 -   Clone the repository to a new `src` subdirectory:
 
-    > -   `git clone https://github.com/noaa-ocs-s100/nos-s100-toolkit ~/nos-s100-toolkit/src`
-    > -   Ensure that `ofs.py` is executable. If not, run
-    >     `chmod gou+x ~/nos-s100-toolkit/src/ofs.py`.
+```bash
+    git clone https://github.com/noaa-ocs-s100/nos-s100-toolkit ~/nos-s100-toolkit/src
+```
+
+-   Ensure that `ofs.py` is executable. If not, run
+
+```bash
+    chmod gou+x ~/nos-s100-toolkit/src/ofs.py
+```
 
 -   Ensure the new `src` directory is in your `$PATH` environment
     variable:
 
-    > -   `export PATH=$PATH:~/nos-s100-toolkit/src`
+```bash
+    export PATH=$PATH:~/nos-s100-toolkit/src
+```
 
 -   Create and configure a new conda environment from the conda
     environment file supplied with the code (this will download and
     install all required packages):
 
-    > -   `conda create --name nos-s100 --file nos-s100_conda_env.txt`
+```bash
+   conda create --name nos-s100 --file nos-s100_conda_env.txt
+```
 
 Execution
 ---------
 
 -   Activate your new conda environment (once activated, conda prepends
     the environment name nos-s100 onto your system command prompt)
-
-    > -   `conda activate nos-s100`
-    > -   `pip install git+https://github.com/noaa-ocs-modeling/thyme.git`
-    > -   `pip install git+https://github.com/noaa-ocs-s100/s100py.git`
-
+```bash
+    conda activate nos-s100
+    pip install s100py
+```
 -   To print detailed usage information:
-
-    > -   `cd ~/nos-s100-toolkit/src`
-    > -   `python ofs.py -h`
-
+```bash
+    cd ~/nos-s100-toolkit/src
+    python ofs.py -h
+```
 -   The following examples describe the steps to create different S-111
     data coding formats. For more information about S-111 data coding
     formats, see the [s100py](https://github.com/noaa-ocs-s100/s100py)
@@ -172,68 +189,73 @@ Execution
 -   Generate an index (grid definition) file for a particular model at a
     particular resolution:
 
-    > *Note: Keep in mind that larger model domains and higher
-    > resolutions will take longer to generate.*
+    > **WARNING:** Keep in mind that larger model domains and higher resolutions will take longer to generate.
+
+    - Download a model output NetCDF file and place in the `netcdf`subdirectory, modifying the model abbreviation, timestamp, and forecast hour as necessary
 
     ```bash
-    # Download a model output NetCDF file and place in the `netcdf`
-    # subdirectory, modifying the model abbreviation, timestamp, and forecast
-    # hour as necessary
-    cd ~/nos-s100-toolkit/netcdf
-    wget https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/CBOFS/MODELS/201907/nos.cbofs.fields.f001.20190701.t00z.nc
+            cd ~/nos-s100-toolkit/netcdf
+            wget https://opendap.co-ops.nos.noaa.gov/thredds/fileServer/NOAA/CBOFS/MODELS/201907/nos.cbofs.fields.f001.20190701.t00z.nc
+    ```
 
-    # Download any land shapefile and/or subgrid shapefile, unzip and place in
-    # the `shp` subdirectory
-    cd ~/nos-s100-toolkit/shp
-    wget https://www.weather.gov/source/gis/Shapefiles/County/s_11au16.zip # U.S. States and Territories
+    - Download any land shapefile and/or subgrid shapefile, unzip and place in the `shp` subdirectory
 
-    # Using the downloaded NetCDF file and subgrid/shoreline shapefiles,
-    # generate a "default grid" index file. The extent (envelope) of the
-    # resulting grid definition will match the model's native domain.
-    # Specifying `-t 500` implies a target cellsize of ~500 meters.
-    python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_default_500m.nc -b -l ~/nos-s100-toolkit/shp/s_11au16.shp -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -t 500 -code 2
+    ```bash
+            cd ~/nos-s100-toolkit/shp
+            wget https://www.weather.gov/source/gis/Shapefiles/County/s_11au16.zip # U.S. States and Territories
+    ```
 
-    # Alternatively, create a "subgrid" index file instead. This requires a
-    # shapefile containing orthogonal grid polygons describing areas for which
-    # distinct S-111 files will be generated (for all grid polygons that
-    # intersect the native model domain). Specifying `-f GridCellName`
-    # indicates the values from the supplied shapefile's "GridCellname"
-    # attribute to be used for the filename of any generated S-111 files. If
-    # not specified, the primary key identifier (e.g. `fid`) will be used
-    # instead to distinguish the S-111 files from each other.
-    python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_subset_500m.nc -b -l ~/nos-s100-toolkit/shp/land.shp -g ~/nos-s100-toolkit/shp/grid.shp -f GridCellName -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -t 500 -code 2
+    - Using the downloaded NetCDF file and subgrid/shoreline shapefiles, generate a "default grid" index file.
+    The extent (envelope) of the resulting grid definition will match the model's native domain.
+    Specifying `-t 500` implies a target cellsize of ~500 meters.
+
+    ```bash
+        python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_default_500m.nc -b -l ~/nos-s100-toolkit/shp/s_11au16.shp -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -t 500 -code 2
+    ```
+
+    -   Alternatively, create a "subgrid" index file instead. This requires a
+    shapefile containing orthogonal grid polygons describing areas for which
+    distinct S-111 files will be generated (for all grid polygons that
+    intersect the native model domain). Specifying `-f GridCellName`
+    indicates the values from the supplied shapefile's "GridCellname"
+    attribute to be used for the filename of any generated S-111 files. If
+    not specified, the primary key identifier (e.g. `fid`) will be used
+    instead to distinguish the S-111 files from each other.
+
+    ```bash
+        python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_subset_500m.nc -b -l ~/nos-s100-toolkit/shp/land.shp -g ~/nos-s100-toolkit/shp/grid.shp -f GridCellName -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -t 500 -code 2
     ```
 
 -   Download the latest full OFS forecast run and convert to S-111
     format (requires specifying a NetCDF index \[grid definition\]
     file):
 
-    ```bash
+```bash
     python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_default_500m.nc -s ~/nos-s100-toolkit/hdf5 -d ~/nos-s100-toolkit/netcdf -o cbofs -code 2
-    ```
+```
 
 -   Skip the download step and convert an existing OFS forecast file to
     S-111 format
 
-    ```bash
+```bash
     python ofs.py -i ~/nos-s100-toolkit/indexes/cbofs_index_default_500m.nc -s ~/nos-s100-toolkit/hdf5 -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -c 2019070100 -code 2
-    ```
+```
 
 **To create \"ungeorectified gridded array\" S-111 files (Coding Format 3)**
 
 -   Download the latest full OFS forecast run and convert to S-111
     format:
 
-    ```bash
+```bash
     python ofs.py -s ~/nos-s100-toolkit/hdf5 -d ~/nos-s100-toolkit/netcdf -o cbofs -code 3
-    ```
+```
 
 -   Skip the download step and convert an existing OFS forecast file to
     S-111 format
 
-    ```bash
+```bash
     python ofs.py -s ~/nos-s100-toolkit/hdf5 -m ~/nos-s100-toolkit/netcdf/nos.cbofs.fields.f001.20190701.t00z.nc -o cbofs -c 2019070100 -code 3
-    ```
+```
 
 Authors
 -------

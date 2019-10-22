@@ -23,24 +23,28 @@ DEST_PATH = '/win/ofsdata/%Y%m%d/HDF5/S111_1.0.0/'
 
 MODEL_INDEX_FILE = {
     'cbofs': {
-        'index_default_path': '{}indexes/v0.9.0/cbofs_index_default_500m.nc'.format(SOURCE_PATH),
-        'index_subset_path': '{}indexes/v0.9.0/cbofs_index_band4v5_500m.nc'.format(SOURCE_PATH)
+        'index_default_path': f'{SOURCE_PATH}indexes/thyme_v0.4.0/cbofs_index_default_500m.nc',
+        'index_subset_path': f'{SOURCE_PATH}indexes/thyme_v0.4.0/cbofs_index_band4v5_500m.nc'
     },
     'dbofs': {
-        'index_default_path': '{}indexes/v0.9.0/dbofs_index_default_500m.nc'.format(SOURCE_PATH),
-        'index_subset_path': '{}indexes/v0.9.0/dbofs_index_band4v5_500m.nc'.format(SOURCE_PATH)
+        'index_default_path': f'{SOURCE_PATH}indexes/thyme_v0.4.0/dbofs_index_default_500m.nc',
+        'index_subset_path': f'{SOURCE_PATH}indexes/thyme_v0.4.0/dbofs_index_band4v5_500m.nc'
     },
     'nyofs': {
-        'index_default_path': '{}indexes/v0.9.0/nyofs_index_default_500m.nc'.format(SOURCE_PATH),
-        'index_subset_path': '{}indexes/v0.9.0/nyofs_index_band4v5_500m.nc'.format(SOURCE_PATH)
+        'index_default_path': f'{SOURCE_PATH}indexes/thyme_v0.4.0/nyofs_index_default_500m.nc',
+        'index_subset_path': f'{SOURCE_PATH}indexes/thyme_v0.4.0/nyofs_index_band4v5_500m.nc'
     },
     'rtofs_east': {
-        'index_default_path': '{}indexes/v0.9.0/rtofs_east_index_default_8500m.nc'.format(SOURCE_PATH),
-        'index_subset_path': '{}indexes/v0.9.0/rtofs_east_index_band2v5_8500m.nc'.format(SOURCE_PATH)
+        'index_default_path': f'{SOURCE_PATH}indexes/thyme_v0.4.0/rtofs_east_index_default_8500m.nc',
+        'index_subset_path': f'{SOURCE_PATH}indexes/thyme_v0.4.0/rtofs_east_index_band2v5_8500m.nc'
     },
     'rtofs_west': {
-        'index_default_path': '{}indexes/v0.9.0/rtofs_west_index_default_8500m.nc'.format(SOURCE_PATH),
-        'index_subset_path': '{}indexes/v0.9.0/rtofs_west_index_band2v5_8500m.nc'.format(SOURCE_PATH)
+        'index_default_path': f'{SOURCE_PATH}indexes/thyme_v0.4.0/rtofs_west_index_default_8500m.nc',
+        'index_subset_path': f'{SOURCE_PATH}indexes/thyme_v0.4.0/rtofs_west_index_band2v5_8500m.nc'
+    },
+    'ngofs': {
+        'index_default_path': f'{SOURCE_PATH}indexes/thyme_v0.4.0/ngofs_index_default_1000m.nc',
+        'index_subset_path': f'{SOURCE_PATH}indexes/thyme_v0.4.0/ngofs_index_band2v5_1000m.nc'
     }
 }
 

@@ -14,6 +14,9 @@ from thyme.model import fvcom
 from thyme.model import pom
 from thyme.model import hycom
 from thyme.util import dateutil
+import time
+
+start_time = time.time()
 
 # Base URL of NCEP NOMADS HTTP for accessing CO-OPS OFS NetCDF files
 HTTP_SERVER_NOMADS = 'https://nomads.ncep.noaa.gov'
@@ -78,8 +81,8 @@ and value is another dictionary with the following properties:
     cycles: List of hour-of-day values corresponding with daily model cycles
         For example, for a model produced four times per day at 0000, 0600,
         1200, and 1800 UTC, specify (0,6,12,18).
-    file_delay: `datetime.timedelta` representing delay (time since model cycle
-        time) of file availability on HTTP server.
+    server_file_delay: `datetime.timedelta` representing delay (time since model cycle
+        time) of file availability on HTTP server, set cron time equal to or greater.
     region: OFS region
     product: Description of product type
     model_type: Type of underlining modelling framework.
@@ -92,7 +95,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
-        'file_delay': datetime.timedelta(minutes=85),
+        'server_file_delay': datetime.timedelta(minutes=85),
         'region': 'Chesapeake_Bay',
         'product': PRODUCT_DESCRIPTION_ROMS,
         'model_type': MODELTYPE_ROMS,
@@ -106,7 +109,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         'forecast_hours': list(range(3, 73, 3)),
         'cycles': (0, 6, 12, 18),
-        'file_delay': datetime.timedelta(minutes=134),
+        'server_file_delay': datetime.timedelta(minutes=134),
         'region': 'Gulf_of_Maine',
         'product': PRODUCT_DESCRIPTION_ROMS,
         'model_type': MODELTYPE_ROMS,
@@ -120,7 +123,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
-        'file_delay': datetime.timedelta(minutes=80),
+        'server_file_delay': datetime.timedelta(minutes=80),
         'region': 'Delaware_Bay',
         'product': PRODUCT_DESCRIPTION_ROMS,
         'model_type': MODELTYPE_ROMS,
@@ -134,7 +137,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
-        'file_delay': datetime.timedelta(minutes=74),
+        'server_file_delay': datetime.timedelta(minutes=74),
         'region': 'Tampa_Bay',
         'product': PRODUCT_DESCRIPTION_ROMS,
         'model_type': MODELTYPE_ROMS,
@@ -148,7 +151,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
-        'file_delay': datetime.timedelta(minutes=95),
+        'server_file_delay': datetime.timedelta(minutes=95),
         'region': 'Northeast_Gulf_of_Mexico',
         'product': PRODUCT_DESCRIPTION_FVCOM,
         'model_type': MODELTYPE_FVCOM,
@@ -162,7 +165,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
-        'file_delay': datetime.timedelta(minutes=90),
+        'server_file_delay': datetime.timedelta(minutes=90),
         'region': 'Northwest_Gulf_of_Mexico',
         'product': PRODUCT_DESCRIPTION_FVCOM,
         'model_type': MODELTYPE_FVCOM,
@@ -176,7 +179,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
-        'file_delay': datetime.timedelta(minutes=50),
+        'server_file_delay': datetime.timedelta(minutes=50),
         'region': 'Northern_Gulf_of_Mexico',
         'product': PRODUCT_DESCRIPTION_FVCOM,
         'model_type': MODELTYPE_FVCOM,
@@ -190,7 +193,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         'forecast_hours': list(range(1, 49)),
         'cycles': (3, 9, 15, 21),
-        'file_delay': datetime.timedelta(minutes=55),
+        'server_file_delay': datetime.timedelta(minutes=55),
         'region': 'San_Francisco_Bay',
         'product': PRODUCT_DESCRIPTION_FVCOM,
         'model_type': MODELTYPE_FVCOM,
@@ -204,7 +207,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_NOMADS_FILENAME_FORMAT,
         'forecast_hours': list(range(1, 49)),
         'cycles': (0, 6, 12, 18),
-        'file_delay': datetime.timedelta(minutes=100),
+        'server_file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Erie',
         'product': PRODUCT_DESCRIPTION_FVCOM,
         'model_type': MODELTYPE_FVCOM,
@@ -218,7 +221,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_THREDDS_NYOFS_FILENAME_FORMAT,
         'forecast_hours': list(range(0, 53)),
         'cycles': (5, 11, 17, 23),
-        'file_delay': datetime.timedelta(minutes=48),
+        'server_file_delay': datetime.timedelta(minutes=48),
         'region': 'Port_of_New_York_and_New_Jersey',
         'product': PRODUCT_DESCRIPTION_POM,
         'model_type': MODELTYPE_POM,
@@ -232,7 +235,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_THREDDS_NYOFS_FILENAME_FORMAT,
         'forecast_hours': list(range(0, 53)),
         'cycles': (5, 11, 17, 23),
-        'file_delay': datetime.timedelta(minutes=48),
+        'server_file_delay': datetime.timedelta(minutes=48),
         'region': 'Port_of_New_York_and_New_Jersey',
         'product': PRODUCT_DESCRIPTION_POM,
         'model_type': MODELTYPE_POM,
@@ -246,7 +249,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT,
         'forecast_hours': list(range(0, 1)),
         'cycles': (0, 6, 12, 18),
-        'file_delay': datetime.timedelta(minutes=100),
+        'server_file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Michigan',
         'product': PRODUCT_DESCRIPTION_POM,
         'model_type': MODELTYPE_POM,
@@ -260,7 +263,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT,
         'forecast_hours': list(range(0, 1)),
         'cycles': (0, 6, 12, 18),
-        'file_delay': datetime.timedelta(minutes=100),
+        'server_file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Huron',
         'product': PRODUCT_DESCRIPTION_POM,
         'model_type': MODELTYPE_POM,
@@ -274,7 +277,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT,
         'forecast_hours': list(range(0, 1)),
         'cycles': (0, 6, 12, 18),
-        'file_delay': datetime.timedelta(minutes=100),
+        'server_file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Ontario',
         'product': PRODUCT_DESCRIPTION_POM,
         'model_type': MODELTYPE_POM,
@@ -288,7 +291,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_THREDDS_GLOFS_FILENAME_FORMAT,
         'forecast_hours': list(range(0, 1)),
         'cycles': (0, 6, 12, 18),
-        'file_delay': datetime.timedelta(minutes=100),
+        'server_file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake_Superior',
         'product': PRODUCT_DESCRIPTION_POM,
         'model_type': MODELTYPE_POM,
@@ -296,13 +299,13 @@ MODELS = {
 
     },
     'rtofs_east': {
-        # Hourly output from +24 to +72
+        # Hourly output from +6 to +72
         'file_server': HTTP_SERVER_NOMADS,
         'file_path': HTTP_NETCDF_NOMADS_RTOFS_EAST_PATH_FORMAT,
         'file_name': LOCAL_NETCDF_OCS_RTOFS_EAST_FILENAME_FORMAT,
-        'forecast_hours': list(range(24, 96, 24)),
+        'forecast_hours': list(range(6, 78, 6)),
         'cycles': (0,),
-        'file_delay': datetime.timedelta(minutes=100),
+        'server_file_delay': datetime.timedelta(minutes=40),
         'region': 'US East',
         'product': PRODUCT_DESCRIPTION_HYCOM,
         'model_type': MODELTYPE_HYCOM,
@@ -310,13 +313,13 @@ MODELS = {
 
     },
     'rtofs_west': {
-        # Hourly output from +24 to +72
+        # Hourly output from +6 to +72
         'file_server': HTTP_SERVER_NOMADS,
         'file_path': HTTP_NETCDF_NOMADS_RTOFS_WEST_PATH_FORMAT,
         'file_name': LOCAL_NETCDF_OCS_RTOFS_WEST_FILENAME_FORMAT,
-        'forecast_hours': list(range(24, 96, 24)),
+        'forecast_hours': list(range(6, 78, 6)),
         'cycles': (0,),
-        'file_delay': datetime.timedelta(minutes=100),
+        'server_file_delay': datetime.timedelta(minutes=40),
         'region': 'US West',
         'product': PRODUCT_DESCRIPTION_HYCOM,
         'model_type': MODELTYPE_HYCOM,
@@ -330,7 +333,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
         'forecast_hours': list(range(1, 21, 3)),
         'cycles': 3,
-        'file_delay': datetime.timedelta(minutes=100),
+        'server_file_delay': datetime.timedelta(minutes=100),
         'region': 'West_Coast',
         'product': PRODUCT_DESCRIPTION_ROMS,
         'model_type': MODELTYPE_ROMS,
@@ -344,7 +347,7 @@ MODELS = {
         'file_name': LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
         'forecast_hours': list(range(1, 121)),
         'cycles': (0, 6, 12, 18),
-        'file_delay': datetime.timedelta(minutes=100),
+        'server_file_delay': datetime.timedelta(minutes=100),
         'region': 'Lake Michigan & Lake Huron',
         'product': PRODUCT_DESCRIPTION_FVCOM,
         'model_type': MODELTYPE_FVCOM,
@@ -359,7 +362,7 @@ MODELS = {
     #    'file_name': LOCAL_NETCDF_THREDDS_FILENAME_FORMAT,
     #    'forecast_hours': list(range(1, 49)),
     #    'cycles': (0, 6, 12, 18),
-    #    'file_delay': datetime.timedelta(minutes=100),
+    #    'server_file_delay': datetime.timedelta(minutes=100),
     #    'region': 'Cook_Inlet',
     #    'product': PRODUCT_DESCRIPTION_ROMS,
     #    'model_type': MODELTYPE_ROMS,
@@ -387,7 +390,7 @@ def get_latest_cycletime(ofs_model):
 
     # Calculate most recent cycle using configured thresholds
     cycles = MODELS[ofs_model]['cycles']
-    file_delay = MODELS[ofs_model]['file_delay']
+    server_file_delay = MODELS[ofs_model]['server_file_delay']
 
     # Start by listing all cycle times for today, chronologically
     today_cycletimes = sorted([datetime.datetime(now.year, now.month, now.day, cycle) for cycle in cycles])
@@ -399,7 +402,7 @@ def get_latest_cycletime(ofs_model):
     # Now search through potential cycle times in reverse chronological
     # order until we find one that should be available
     for potential_cycletime in reversed(potential_cycletimes):
-        if now >= potential_cycletime + file_delay:
+        if now >= potential_cycletime + server_file_delay:
             cycletime = potential_cycletime
             break
 
@@ -565,7 +568,7 @@ def create_index_file(index_file_path, model_file_path, model_type, model_name, 
         index_file.close()
         model_output_file.close()
 
-    return False
+        return False
 
 
 def main():
@@ -637,13 +640,13 @@ def main():
             return 1
 
         return 0 if create_index_file(args.index_file_path,
-                                args.model_file_path[0],
-                                MODELS[ofs_model]['model_type'],
-                                args.ofs_model,
-                                args.target_cellsize_meters,
-                                args.grid_shp,
-                                args.grid_field_name,
-                                args.land_shp) else 1
+                                      args.model_file_path[0],
+                                      MODELS[ofs_model]['model_type'],
+                                      args.ofs_model,
+                                      args.target_cellsize_meters,
+                                      args.grid_shp,
+                                      args.grid_field_name,
+                                      args.land_shp) else 1
 
     if not os.path.isdir(args.s111_dir):
         parser.error('Invalid/missing S-111 output directory (-s/-s111_dir) specified.')
@@ -695,3 +698,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    print(f"-- Run Time -- {(time.time() - start_time)} seconds")
